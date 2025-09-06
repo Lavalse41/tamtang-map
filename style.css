@@ -1,0 +1,19 @@
+#map {
+    height: 600px;
+    width: 1000px;
+  }
+
+#test {
+    color:red;
+}
+
+.map-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.search {
+  width: 300px;
+  padding: 7px 10px;
+}
