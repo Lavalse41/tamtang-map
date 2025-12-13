@@ -4,126 +4,214 @@
 <title>Tamtang Map</title>
 <link rel="stylesheet" type="text/css" href="./style.css" />
 <script src="https://kit.fontawesome.com/9b619cdf6b.js" crossorigin="anonymous"></script>
+<link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script type="module" src="./map.js"></script>
 <script type="module" src="./script.js"></script>
 <script type="module" src="./search.js"></script>
-<script type="text/javascript" src="http://127.0.0.1:3000/public/mapdata.js"></script>
-<script  type="text/javascript" src="http://127.0.0.1:3000/public/countrymap.js"></script>
+<script type="text/javascript" src="http://127.0.0.1:5500/public/mapdata.js"></script>
+<script type="text/javascript" src="http://127.0.0.1:5500/public/countrymap.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&family=Maitree:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>    
-    <div id="header">
-      <h2 id="title">Tamtang Map</h2>  
-    </div>
+  <div id="content-wrapper">  
+    <div id="namelist-wrapper">
 
-    <div id="content-wrapper">  
-      <div id="namelist-wrapper" class="">
-          <div class="column-wrapper line-gap" >
-              <input type="text" class="search" placeholder="ค้นหาจังหวัด">
-              <div id="filter-container" class="row-wrapper">
-                <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
-                  <option value="" selected>อายุครรภ์ที่รับ (สัปดาห์)</option>
-                  <option value=9>ไม่เกิน 9</option>
-                  <option value=12>ไม่เกิน 12</option>
-                  <option value=24>ไม่เกิน 24</option>>
-                </select>
+        <div id="title-wrapper">
+          <img src="./asset/logo.jpg" width="100px">
+          <div>แผนที่สถานบริการยุติการตั้งครรภ์ในประเทศไทย</div>
+        </div>
+
+        
+        <div class="column-wrapper line-gap-m">
+
+          <div class="column-wrapper line-gap-s">
+
+            <div class="row-wrapper">
+              <input type="text" id="search" placeholder="ค้นหาจังหวัด">
+              <button id="search-btn">ค้นหา</button>
+            </div>
+              
+            <div id="filter-container" class="row-wrapper">
                 <select name="type" id="type-filter" placeholder="รัฐ / เอกชน">
-                  <option value="" selected>รัฐ / เอกชน</option>
-                  <option value="รัฐ">รัฐ</option>
-                  <option value="เอกชน">เอกชน</option>
+                  <option value="" selected>ฟรี</option>
+                  <option value="รัฐ">ไม่เกิน 3,000</option>
+                  <option value="เอกชน">ไม่เกิน 5,000</option>
+                  <option value="เอกชน">ทั้งหมด</option>
                 </select>
-                <button id="search-btn">ค้นหา</button>
-              </div>
+                <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
+                  <option value=9>เกิน 12</option>
+                  <option value=12>เกิน 20</option>
+                  <option value=24>ทั้งหมด</option>
+                </select>
+                <div class="filter-outer-wrapper">
+                  <div class="icons">
+                  <img class="filter-icon" src="./asset/filter.svg">
+                  <div id="filter-select-wrapper">
+                    <div class="row-wrapper">
+                      <input type="checkbox" id="free-filter">
+                      <span>รัฐ</span>
+                    </div>
+                    <div class="row-wrapper">
+                      <input type="checkbox" id="free-filter">
+                      <span>เอกชน</span>
+                    </div>
+                    <div class="row-wrapper">
+                      <input type="checkbox" id="free-filter">
+                      <span>มีบริการสำหรับต่างชาติ</span>
+                    </div>
+                  </div>
+                </div>
+            </div>  
           </div>
-     
-        <div id="card-wrapper" class="column-wrapper" >
+        </div>
+   
+        <!-- <div id="card-wrapper" class="column-wrapper" >
           <div class="empty">
             ค้นหาจังหวัดที่ต้องการ
           </div>
-        </div>
-      </div>
-  
-      <div id="detail-wrapper" class="">  
-        <div id="back-btn">
-          <span><i class="fa-solid fa-arrow-left fa-lg"></i></span>
-        </div>
-  
-        <div class="detail-img"></div>
-  
-        <div class="detail-container">
-            <div class="detail-title">
-              <p class="title-th">
-                สมาคมพัฒนาประชากรและชุมชน สาขากรุงเทพ
-              </p>
-              <p class="title-en">
-                Population and Community Development Association
-              </p>
-            </div>
-            <div class="bullet-container">
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>รับอายุครรภ์ ไม่เกิน 12 สัปดาห์</span>
-              </p>
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>วันจันทร์ - ศุกร์ เวลา 7:00- 19:00 น.</span>
-              </p>
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>02-229-5803-5 ต่อ 250,<br>251 โทรสาร 02-229-4632</span>
-              </p>
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>รับส่งต่อ ทั่วประเทศ</span>
-              </p>
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>อายุต่ำกว่า 15 ปี ต้องมีผู้ปกครอง</span>
-              </p>
-              <p>
-                <img class="icon" src=".\asset\icon-test.png"></img>
-                <span>ไม่มียาสำหรับต่างชาติ</span>
-              </p>
-            </div>
-            <div>
-              <span>วิธียุติการตั้งครรภ์</span>
-              <table>
-                <tr>
-                  <th class="method">วิธี</td>
-                  <th class="price">ค่าบริการ</th>
-                </tr>
-                <tr>
-                  <td scope="row">ดูดสุญญากาศ</td>
-                  <td scope="row">กรณีไม่ใช้ยาชา 6,000 บาท<br>กรณีใช้ยาชามีค่าใช้จ่ายเพิ่มเติม ค่าบริการ 4,900 บาท (บริการพักนอนในวันที่ 2) ค่าบริการรวมอัลตราซาวด์<br>*เฉพาะอัลตราซาวด์ 500 บาท</td>
-                </tr>
-                <tr class="unavailable">
-                  <td scope="row">ยา</td>
-                  <td colspan="4">งดบริการชั่วคราว</td>
-                </tr>
-              </table>
-            </div>
-            <div>
-              <span><a href="www.google.com">ดูตำแหน่งบน Google Map</a></span>
+        </div> -->
+
+          <div id="noti-wrapper">
+            <span>กรุงเทพฯ มีทั้งสถานบริการรัฐและเอกชน</span>
+            <p>หากไม่พบสถานบริการที่สนใจ สามารถติดต่อทำทาง<br>
+            เพื่อขอรับยาทางไปรษณีย์ หรือสอบถามเพิ่มเติมได้นะ</p>
+          </div>
+
+          <div id="outer-card-wrapper">
+            <div id="place-card-wrapper">
+              <div id="place-wrapper">
+                <h3>โรงพยาบาลคลองตัน</h3>
+                <div class="tag-container">
+                  <span class="tag focus">ไม่เกิน 24 สัปดาห์</span>
+                  <span class="tag">ราคาตามอายุครรภ์</span>
+                  <span class="tag"><img class="icon" src=".\asset\triangle.svg"></img><span>อายุต่ำกว่า 15 ปี ต้องมีผู้ปกครอง</span></span>
+                </div>
+              </div>
+              <div id="detail-link">
+                <div class="row-wrapper"><span >ดูรายละเอียด</span><img class="icon" src=".\asset\chevron-right.svg"></div>
+                <hr>
+              </div>
             </div>
           </div>
-      </div>
-      
-
-      <div id="map-wrapper">
-        <!-- google map -->
-        <!-- <div id="map"></div> -->
-        <!-- simplemap -->
-        <div id="simplemap"></div>
-        <!-- <div id="map-bg"><img src="https://i.ibb.co/dsy53M4X/thaimap.png" alt="thaimap" border="0"></div> -->
-      
-      </div>   
+        </div>
     </div>
 
+    <div id="detail-wrapper" class="">  
+      <div id="back-btn">
+        <span><i class="fa-solid fa-arrow-left fa-lg"></i></span>
+      </div>
+
+      <div class="detail-img"></div>
+
+      <div class="detail-container">
+          <div class="detail-title">
+            <p class="title-th">
+              สมาคมพัฒนาประชากรและชุมชน สาขากรุงเทพ
+            </p>
+            <p class="title-en">
+              Population and Community Development Association
+            </p>
+          </div>
+          <div>
+            <div class="preg-container" >
+                  <img class="icon" src=".\asset\clock.svg"></img>
+                  <span>รับอายุครรภ์ ไม่เกิน 12 สัปดาห์</span>
+            </div>
+            <div class="bullet-container">
+              <div class="row-wrapper">
+                <img class="icon" src=".\asset\calendar.svg"></img>
+                <div>
+                  <p>เปิดทำการ วันจันทร์ - ศุกร์ เวลา 8:00- 16:30 น.</p>
+                  <p>หยุดวันนักขัตฤกษ์</p>
+                </div>
+              </div>
+
+              <div class="row-wrapper">
+                <img class="icon" src=".\asset\phone.svg"></img>
+                <div>
+                  <p>02-229-5803-5 ต่อ 250,<br>251 โทรสาร 02-229-4632</p>
+                  <p id="contact-note-margin">
+                  *สอบถามการเดินทางเพื่อป้องกันการถูกหลอกลวงไปที่อื่นระหว่างเดินทาง 062-2591299 (8.00-16.30 น.)
+                  </p>
+                </div>
+              </div>
+
+              <div class="row-wrapper">
+                <img class="icon" src=".\asset\line.svg"></img>
+                <p>pda.clinic</p>
+              </div>
+              <div class="row-wrapper">
+                <img class="icon" src=".\asset\letter.svg"></img>
+                <p>pda@gmail.com</p>
+              </div>
+          </div>
+
+          <div id="cont-container">
+            <div class="row-wrapper">
+              <div class="icon">
+                <img class="bullet-icon" src=".\asset\bullet.svg"></img>
+              </div>
+              <p>Walk in ได้</p>
+            </div>
+            <div class="row-wrapper">
+              <div class="icon">
+                <img class="bullet-icon" src=".\asset\bullet.svg"></img>
+              </div>
+              <p>รับส่งต่อทั่วประเทศ</p>
+            </div>  
+          </div>
+
+          <div id="warning-wrapper"> 
+            <div class="warning-container row-wrapper">
+              <img class="icon" src=".\asset\triangle.svg"></img>
+              <div>อายุต่ำกว่า 18 ปี ต้องมีผู้ปกครอง</div>
+            </div>
+            <div class="warning-container row-wrapper">
+              <img class="icon" src=".\asset\triangle.svg"></img>
+              <div>ไม่มีบริการสำหรับต่างชาติ</div>
+            </div>    
+          </div>
+        </div>
+
+        <div class="table-container">
+            <p class="header">บริการยุติการตั้งครรภ์</p>
+            <table>
+              <tr>
+                <th class="method">ประเภท</td>
+                <th class="price">ค่าบริการ</th>
+              </tr>
+            </table>
+            <div id="money-aid-container">
+              <p>หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ สามารถติดต่อทำทางเพื่อขอรับความช่วยเหลือได้ค่ะ</p>
+            </div> 
+        </div>
+
+        <div class="other-service-container">
+          <p class="header">บริการอื่นๆ</p>
+          <p>(กรุณาสอบถามราคาจากคลินิค)</p>
+          <div id="cont-container">
+          </div>
+        </div>
+        <div>
+          <span><a href="www.google.com">ดูตำแหน่งบน Google Map</a></span>
+        </div>
+      </div>
+    </div>
+    
+<!-- <div id="map-wrapper"> -->
+<div id="simplemap"></div>
+<!-- </div>     -->
   
+
 <!-- MAP -->
 <!-- <script>
   (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -132,6 +220,25 @@
   });
 </script> -->
    
+<script>
+			jQuery('.icons img').each(function () {
+				const $img = jQuery(this);
+				const imgID = $img.attr('id');
+				const imgClass = $img.attr('class');
+				const imgURL = $img.attr('src');
+				jQuery.get(
+					imgURL,
+					(data) => {
+						let $svg = jQuery(data).find('svg');
+						if (imgID) $svg.attr('id', imgID);
+						if (imgClass) $svg.attr('class', `${imgClass} replaced-svg`);
+						$svg.removeAttr('xmlns:a');
+						$img.replaceWith($svg);
+					},
+					'xml',
+				);
+			});
+</script>
 </body>
 </html>
 

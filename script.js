@@ -201,7 +201,7 @@ cardWrapper.on("click", ".see-detail", async function(event) {
 
     const {name_th, name_en, preg_week, type, open_day, open_time, 
           closed_day, tel, refer_in_cap, under_age, foreigner_med, 
-          condition, remark, map_url, img_url, service} = data;
+          condition, remark, map_url, img_url, cost, service} = data;
     
     const detailImage =  `<img src="${img_url}" alt="${name_en}">`;
 
