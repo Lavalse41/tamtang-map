@@ -389,7 +389,7 @@ var simplemaps_countrymap_mapdata={
   },
   locations: {
     "0": {
-      name: "Bangkok",
+      name: "กรุงเทพมหานคร",
       lat: "13.753979",
       lng: "100.501444"
     }

@@ -1,15 +1,16 @@
 let map;
 
 export async function initMap(provinceData, centerPosition) { 
-    // console.log("provinceData: ", provinceData);
-  
+    console.log("provinceData gm: ", provinceData);
+    console.log("gm init");
+
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
     const centerDefault = {
         "lat": 13.7271822,
         "lng": 100.5349397
     }
-
-    const { Map } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
     map = new Map(document.getElementById("map"), {
         center: centerDefault,
@@ -23,12 +24,15 @@ export async function initMap(provinceData, centerPosition) {
     }
     
     if (provinceData) {
-      console.log("provinceData: ", provinceData);
+      console.log("provinceData gm inside: ", provinceData);
 
       Object.values(provinceData).forEach((place) => {
+      const formatLat = Number(place.lat);
+      const formatLng = Number(place.lng);
+    
       const marker = new AdvancedMarkerElement({
           map: map,
-          position: place.position,
+          position: {"lat": formatLat, "lng": formatLng},
           title: place.name_th, 
       });
 

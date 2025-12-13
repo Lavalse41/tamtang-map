@@ -1,4 +1,3 @@
-// import { handleSearch } from "./script.js";
 /*Copyright 2010-2025 Simplemaps.com
 html5countrymapv4.504 - trial version
 Use pursuant to license agreement at https://simplemaps.com/license */
@@ -8,7 +7,7 @@ Use pursuant to license agreement at https://simplemaps.com/license */
 /* Raphaël 2.1.2 (tweaked, always global)- JavaScript Vector Library, Copyright © 2008-2016 Dmitry Baranovskiy (http://raphaeljs.com), Copyright © 2008-2016 Sencha Labs (http://sencha.com), Licensed under the MIT (http://raphaeljs.com/license.html) license. */
 
 
-function test() {
+function click() {
   return function () {
     console.log(this.sm.name);
 
@@ -8506,7 +8505,7 @@ var simplemaps_countrymap_mapinfo = {
           (c.sm.inactive = n.inactive),
           (c.sm.display_ids = n.display_ids),
         //  (c.sm.on_click = tj(n.popup)),
-         (c.sm.on_click = test()),
+         (c.sm.on_click = click()),
          typeof c.sm.on_click === "function" && c.click(c.sm.on_click),
           // (c.sm.popup_off = tB(n.popup)),
           (c.sm.labels = []),

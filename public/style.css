@@ -149,6 +149,8 @@
     margin-left: -890px;
     background-color: white;
     filter: drop-shadow(rgba(0, 0, 0, 0.14) 0.5rem 0.5rem 10px);
+    overflow:scroll;
+    padding-bottom: 4rem;
   }
     #detail-wrapper .detail-img {
       border-radius: var(--border-radius-m);
@@ -309,6 +311,10 @@
           }
 
           #filter-outer-wrapper {
+            position: relative;
+          }
+
+          #filter-btn {
             position: relative;
           }
 
@@ -509,7 +515,8 @@ select {
 }
 
 .hide {
-  display: none;
+  display:none;
 }
+
 
 /* universal */
