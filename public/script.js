@@ -9,15 +9,18 @@ $('#simplemap').show();
 $('#map').hide();  
 //$("#filter-select-wrapper").addClass("hide");
 
-let centerPosData = {};
-
 const searchInput = $("#search");
 const weekSelectbox = $("#week-filter")
 const priceSelectbox = $("#price-filter")
 const typeSelectbox = $("#type-filter")
-const cardWrapper = $("#outer-card-wrapper");
+
+const placeCardWrapper = $("#outer-card-wrapper");
+const statusCardWrapper = $("#noti-wrapper");
+
 const searchBtn = $("#search-btn");
 const backBtn = $("#back-btn span");
+
+let centerAndStatusData = {};
 
 //function to calculate preg week filter
 function calStartAfter(week) {
@@ -50,9 +53,9 @@ async function makeProvinceList() {
 };
 
 // function to fetch center of province and status
-async function getProvinceCenter(province) {
+async function getProvinceCenterStatus(province) {
   try {
-    console.log("province: ", province);
+    //console.log("province: ", province);
 
     const url = new URL('http://tamtangtest.local/wp-json/custom/v1/center');
     url.searchParams.set("province", province);
@@ -65,8 +68,6 @@ async function getProvinceCenter(province) {
 
     const data = await response.json();
 
-    console.log("data center: ", data);
-
     return data;
   } catch (error) {
     console.error('Error fetching province center:', error);
@@ -74,7 +75,7 @@ async function getProvinceCenter(province) {
   }
 }
 
-// function to fetch data based on search
+// function to fetch place data based on search
 async function getData(province, week, type, foreignerMed) { 
   try {
 
@@ -133,67 +134,104 @@ export async function handleSearch(province) {
    
   // 3.create empty card html
   let newCard = "";
-  
+  let newStatusCard = "";
+
   // 4.fetch data based on searched province and filter values
+  //ถ้ามีการกรอกจังหวัด
   if (searchedProvince !== "") {
     try {
       const provinceData = await getData(searchedProvince, weekValue, typeValue, foreignerMed); 
       console.log('provinceData : ', provinceData);
 
-      centerPosData = await getProvinceCenter(searchedProvince);
-      console.log('centerPosData : ', centerPosData);
-   
-      // generate google map
+      centerAndStatusData = await getProvinceCenterStatus(searchedProvince);
+      console.log("centerAndStatusData:", centerAndStatusData);
+    
+      //ถ้ามีจังหวัดที่ตรงตามที่ค้นหา
       if (provinceData.length !== 0) {
+        console.log("province found");
+
+        //generate google map
          $('#simplemap').hide()
          $('#map').show();  
-        initMap(provinceData, centerPosData); 
-      } else {
-        console.log("province not found")
-      }
-
-      // generate status card
-      // if (provinceData.length === 0) {
+        initMap(provinceData, centerAndStatusData);
         
-      // }
+        //get province name and status
+        const provinceName = centerAndStatusData[0].province;
+        console.log("provinceName:", provinceName);
+        const provinceStatus = centerAndStatusData[0].status;
+        console.log("provinceStatus:", provinceStatus);
 
-      // generate card html
-      for (const key in provinceData){
-        if (provinceData.hasOwnProperty(key)){
-          const nameThai = provinceData[key].name_th;
-          const pregWeek = provinceData[key].preg_week;
-          const type = provinceData[key].type;
-          const placeId = provinceData[key].place_id;
+        //generate status card html
+        let provinceStatusHtml = "";
 
-          //let costNew = Number(cost);
-          //costNew = costNew === 1 ? 'ราคาตามอายุครรภ์' : `${costNew.toLocaleString()} บาท`;
-
-          newCard += `
-            <div class="place-card-wrapper" data-key="${placeId}">
-              <div id="place-wrapper">
-                <h3>${nameThai} <span class="hide">${type}</span></h3>
-                <div class="tag-container">
-                  <span class="tag focus">ไม่เกิน ${pregWeek} สัปดาห์</span>
-                  <span class="tag"></span>
-                </div>
-              </div>
-              <div id="detail-link">
-                <div class="row-wrapper"><span >ดูรายละเอียด</span><img class="icon" src="./asset/chevron-right.svg"></div>
-                <hr>
-              </div>
-          </div>
-          `;
-        
-        } else {
-          console.log("data not found");
+        if (provinceStatus === 'has_gov_and_private') {
+          return provinceStatusHtml += "มีทั้งสถานบริการรัฐและเอกชน"
         }
-      }
-      cardWrapper.html(newCard);
 
-      // $(".card").on("click", function() {
-      //   const position = JSON.parse($(this).attr("data-position")); 
-      //   goToLocation(position); 
-      // });
+        //generate status card html
+        newStatusCard += `
+            <div>
+              <span>${provinceName} ${provinceStatusHtml}</span>
+              <p>ปรึกษาทำทางเพื่อหาทางเลือกเพิ่มเติม<br>
+              หรือลองนำฟิลเตอร์บางอันออก แล้วค้นหาใหม่อีกครั้ง</p>
+            </div>
+        `;
+
+        //add color
+        statusCardWrapper.removeClass("inactive").addClass("active");
+        
+      } else {
+        //ถ้าไม่มีจังหวัดที่ตรงตามที่ค้นหา
+        console.log("no province found");
+
+        //generate status card html
+         newStatusCard += `
+            <div>
+              <span>ไม่พบสถานบริการที่คุณต้องการ</span>
+              <p>ปรึกษาทำทางเพื่อหาทางเลือกเพิ่มเติม<br>
+              หรือลองนำฟิลเตอร์บางอันออก แล้วค้นหาใหม่อีกครั้ง</p>
+            </div>
+        `;
+
+         //add color
+        statusCardWrapper.removeClass("active").addClass("inactive");
+
+        for (const key in provinceData){
+          if (provinceData.hasOwnProperty(key)){
+            const nameThai = provinceData[key].name_th;
+            const pregWeek = provinceData[key].preg_week;
+            const type = provinceData[key].type;
+            const placeId = provinceData[key].place_id;
+
+            //let costNew = Number(cost);
+            //costNew = costNew === 1 ? 'ราคาตามอายุครรภ์' : `${costNew.toLocaleString()} บาท`;
+
+            newCard += `
+              <div class="place-card-wrapper" data-key="${placeId}">
+                <div id="place-wrapper">
+                  <h3>${nameThai} <span class="hide">${type}</span></h3>
+                  <div class="tag-container">
+                    <span class="tag focus">ไม่เกิน ${pregWeek} สัปดาห์</span>
+                    <span class="tag"></span>
+                  </div>
+                </div>
+                <div id="detail-link">
+                  <div class="row-wrapper"><span >ดูรายละเอียด</span><img class="icon" src="./asset/chevron-right.svg"></div>
+                  <hr>
+                </div>
+            </div>
+            `;
+            } else {
+              console.log("data not found");
+            }
+          }    
+
+      }
+
+      placeCardWrapper.html(newCard);
+      statusCardWrapper.html(newStatusCard);
+
+      console.log("newcard:", newCard);
 
       //reset search value
       // searchInput.val("");
@@ -216,7 +254,7 @@ $("#search").autocomplete({
 });
 
 // function to handle place card click to see detail
-cardWrapper.on("click", ".place-card-wrapper", async function(event) {
+placeCardWrapper.on("click", ".place-card-wrapper", async function(event) {
   console.log("see detail clicked");
   
   if ($("#detail-wrapper").css("margin-left") === '-890px') {
@@ -508,7 +546,7 @@ searchBtn.on("click", handleSearch);
 // back btn to name list
 backBtn.on("click", ()=> {
     $("#detail-wrapper").animate({"margin-left": '-=890px'},1000);
-    clearMap(centerPosData);
+    clearMap(centerAndStatusData);
 });
 
 window.handleSearch = handleSearch;

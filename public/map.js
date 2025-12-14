@@ -18,6 +18,7 @@ export async function initMap(provinceData, centerPosition) {
         mapId: "DEMO_MAP_ID"
     });
 
+    // ไม่เจอค่า
     if (centerPosition) {
         map.setCenter(centerPosition);
         map.setZoom(12);

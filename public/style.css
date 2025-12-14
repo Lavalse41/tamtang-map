@@ -9,6 +9,9 @@
   --gray-light: #eaeaea;
   --gray-dark: #4a4a4a;  
 
+  --active-color:#C1FF6B;
+  --inactive-color:#eaeaea;
+
   --font-color: #202020;
   --font-body: 'Anuphan', sans-serif;
   --font-heading: 'Maitree', sans-serif;
@@ -33,6 +36,14 @@
   box-sizing: border-box;
   font-family: var(--font-body);
   color: var(--font-color);
+}
+
+.active {
+  background-color: var(--active-color);
+}
+
+.inactive {
+  background-color: var(--inactive-color);  
 }
 
 
@@ -118,10 +129,8 @@
   #noti-wrapper {
       width: 100%;
       border-radius: var(--border-radius-m);
-      background-color: #c1ff6bd0;
       padding: 16px;
       text-align: center;
-   
   }  
 
   #noti-wrapper p {
