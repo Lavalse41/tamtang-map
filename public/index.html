@@ -39,17 +39,31 @@
             </div>
               
             <div id="filter-container" class="row-wrapper">
-                <select name="type" id="type-filter" placeholder="รัฐ / เอกชน">
-                  <option value="" selected>ฟรี</option>
-                  <option value="">ไม่เกิน 3,000</option>
-                  <option value="">ไม่เกิน 5,000</option>
-                  <option value="">ทั้งหมด</option>
-                </select>
-                <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
-                  <option value=9>เกิน 12</option>
-                  <option value=12>เกิน 20</option>
-                  <option value=24>ทั้งหมด</option>
-                </select>
+                <div>
+                  <div>ราคา</div>
+                  <select name="price" id="price-filter" placeholder="ค่าบริการ">
+                    <option value="free" selected>ฟรี</option>
+                    <option value="max3000">ไม่เกิน 3,000</option>
+                    <option value="max5000">ไม่เกิน 5,000</option>
+                    <option value="all">ทั้งหมด</option>
+                  </select>
+                </div>
+                <div>
+                  <div>อายุครรภ์ที่รับ</div>
+                  <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
+                    <option value=12>เกิน 12</option>
+                    <option value=20>เกิน 20</option>
+                    <option value="all" selected>ทั้งหมด</option>
+                  </select>
+                </div>
+                <div>
+                  <div>ประเภท</div>
+                  <select name="type" id="type-filter" placeholder="ประเภท">
+                    <option value="gov">รัฐ</option>
+                    <option value="private">เอกชน</option>
+                    <option value="all" selected>รัฐและเอกชน</option>
+                  </select>
+                </div>
 
                 <div class="filter-outer-wrapper">
                   <span class="filter-btn">
@@ -58,15 +72,7 @@
                   </span>
                   <div id="filter-select-wrapper">
                     <div class="row-wrapper">
-                      <input type="checkbox" id="gov" value="y">
-                      <span>รัฐ</span>
-                    </div>
-                    <div class="row-wrapper">
-                      <input type="checkbox" id="privat" value="y">
-                      <span>เอกชน</span>
-                    </div>
-                    <div class="row-wrapper">
-                      <input type="checkbox" id="foreigner-med" value="y">
+                      <input type="checkbox" id="foreigner-med-checkbox">
                       <span>มีบริการสำหรับต่างชาติ</span>
                     </div>
                   </div>

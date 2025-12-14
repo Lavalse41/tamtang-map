@@ -13,6 +13,7 @@ let centerPosData = {};
 
 const searchInput = $("#search");
 const weekSelectbox = $("#week-filter")
+const priceSelectbox = $("#price-filter")
 const typeSelectbox = $("#type-filter")
 const cardWrapper = $("#outer-card-wrapper");
 const searchBtn = $("#search-btn");
@@ -58,16 +59,16 @@ async function getProvinceCenter(province) {
   // .then(data => console.log('infunction center: ', data));
 }
 // function to fetch data based on search
-async function getData(province, type, week, foreignerMed) { 
+async function getData(province, week, type) { 
   try {
 
      const url = new URL('http://tamtangtest.local/wp-json/custom/v1/place');
-      url.searchParams.set("province", province);
-      url.searchParams.set("gov", gov);
-      url.searchParams.set("privat", privat);
-      url.searchParams.set("foreigner_med", foreignerMed);
-      url.searchParams.set("week", week);
-
+      if (province) url.searchParams.set("province", province);
+      if (week) url.searchParams.set("week", week);
+      if (type) url.searchParams.set("type", type);
+      
+      console.log("url: ", url);
+    
       const response = await fetch(url);
 
       const data = await response.json();
@@ -96,19 +97,31 @@ async function getService(place_id) {
 // function to handle search province  
 export async function handleSearch(province) {
 
-  console.log('handleSearch function called:', province);
+  console.log('handleSearch function called:');
 
+  // 1.get searched province and filter values
   const searchedProvince = searchInput.val() || province;
   // const searchedProvince = "กรุงเทพมหานคร"; 
-  const typeValue = typeSelectbox.val();
+  const priceValue = priceSelectbox.val();
   const weekValue = weekSelectbox.val();
+  const typeValue = typeSelectbox.val();
+  const foreignerMedCheckbox = $("#foreigner-med-checkbox");
+  const foreignerMed = foreignerMedCheckbox.is(":checked") ? "y" : "n";
+
+  console.log('searchedProvince : ', searchedProvince);
+  console.log('priceValue : ', priceValue);
+  console.log('weekValue : ', weekValue);
+  console.log('typeValue : ', typeValue);
+  console.log('foreignerMed : ', foreignerMed);
    
+  // 3.create empty card html
   let newCard = "";
   
+  // 4.fetch data based on searched province and filter values
   if (searchedProvince !== "") {
     try {
 
-      const provinceData = await getData(searchedProvince, typeValue, weekValue); 
+      const provinceData = await getData(searchedProvince, weekValue, typeValue); 
       console.log('provinceData : ', provinceData);
 
       centerPosData = await getProvinceCenter(searchedProvince);
@@ -161,7 +174,7 @@ export async function handleSearch(province) {
       // });
 
       //reset search value
-      searchInput.val("");
+      // searchInput.val("");
 
     } catch (error) {
       console.error(error.message);
@@ -459,6 +472,8 @@ cardWrapper.on("click", ".place-card-wrapper", async function(event) {
   detailOtherService.html(newOtherService);
 
 });
+
+// ==== BUTTON ====
 
 //filter btn
 $(".filter-btn").on("click", function() {
