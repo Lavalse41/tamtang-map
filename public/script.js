@@ -59,13 +59,14 @@ async function getProvinceCenter(province) {
   // .then(data => console.log('infunction center: ', data));
 }
 // function to fetch data based on search
-async function getData(province, week, type) { 
+async function getData(province, week, type, foreignerMed) { 
   try {
 
      const url = new URL('http://tamtangtest.local/wp-json/custom/v1/place');
       if (province) url.searchParams.set("province", province);
       if (week) url.searchParams.set("week", week);
       if (type) url.searchParams.set("type", type);
+      if (foreignerMed) url.searchParams.set("foreignerMed", foreignerMed);
       
       console.log("url: ", url);
     
@@ -121,7 +122,7 @@ export async function handleSearch(province) {
   if (searchedProvince !== "") {
     try {
 
-      const provinceData = await getData(searchedProvince, weekValue, typeValue); 
+      const provinceData = await getData(searchedProvince, weekValue, typeValue, foreignerMed); 
       console.log('provinceData : ', provinceData);
 
       centerPosData = await getProvinceCenter(searchedProvince);
