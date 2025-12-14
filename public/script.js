@@ -31,6 +31,7 @@ function calStartAfter(week) {
      return null;
   }
 }  
+
 // function to fetch province list
 const provinceList = await makeProvinceList();    
 async function makeProvinceList() {
@@ -47,17 +48,32 @@ async function makeProvinceList() {
     throw error;
   }
 };
-// function to fetch center of province
+
+// function to fetch center of province and status
 async function getProvinceCenter(province) {
-  // console.log("province: ", province);
+  try {
+    console.log("province: ", province);
 
-  const url = new URL('http://tamtangtest.local/wp-json/custom/v1/center');
-  url.searchParams.set("province", province);
+    const url = new URL('http://tamtangtest.local/wp-json/custom/v1/center');
+    url.searchParams.set("province", province);
 
-  fetch(url)
-  .then(res => res.json())
-  // .then(data => console.log('infunction center: ', data));
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log("data center: ", data);
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching province center:', error);
+    throw error;
+  }
 }
+
 // function to fetch data based on search
 async function getData(province, week, type, foreignerMed) { 
   try {
@@ -121,12 +137,12 @@ export async function handleSearch(province) {
   // 4.fetch data based on searched province and filter values
   if (searchedProvince !== "") {
     try {
-
       const provinceData = await getData(searchedProvince, weekValue, typeValue, foreignerMed); 
       console.log('provinceData : ', provinceData);
 
       centerPosData = await getProvinceCenter(searchedProvince);
-
+      console.log('centerPosData : ', centerPosData);
+   
       // generate google map
       if (provinceData.length !== 0) {
          $('#simplemap').hide()
@@ -135,6 +151,11 @@ export async function handleSearch(province) {
       } else {
         console.log("province not found")
       }
+
+      // generate status card
+      // if (provinceData.length === 0) {
+        
+      // }
 
       // generate card html
       for (const key in provinceData){
