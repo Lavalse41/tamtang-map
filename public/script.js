@@ -22,19 +22,6 @@ const backBtn = $("#back-btn span");
 
 let centerAndStatusData = {};
 
-//function to calculate preg week filter
-function calStartAfter(week) {
-  if (week >= 1 && week <= 24) {
-     return 9;
-  } else if (week > 9 && week <= 24) {
-     return 12;
-  } else if (week > 12 && week <= 24) {
-     return 24;
-  } else {
-     return null;
-  }
-}  
-
 // function to fetch province list
 const provinceList = await makeProvinceList();    
 async function makeProvinceList() {
