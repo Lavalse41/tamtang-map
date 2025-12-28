@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <title>Tamtang Map</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" type="text/css" href="./style.css" />
 <script src="https://kit.fontawesome.com/9b619cdf6b.js" crossorigin="anonymous"></script>
 <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
@@ -18,11 +19,197 @@
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&family=Maitree:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>    
-  <div id="content-wrapper"> 
+<body>  
+
+  <!-- Start Modal -->
+  <!-- <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title fs-5" id="notiModalLabel">(ข้อความต้อนรับ)</div>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <li>ตอนนี้ทำแท้งถูกกฎหมายแล้ว</li>
+            <li>เราสามารถรับบริการได้ฟรี อย่างไร</li>
+            <li>หากค้นหาแล้ว ไม่พบสถานที่ที่ต้องการ สามารถติดต่อทำทางเพื่อขอข้อมูลสถานที่อื่นที่ไม่ได้อยู่บนแผนที่</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--icon" data-bs-target="#notiModal2" data-bs-toggle="modal">
+            <span class="btn__title">ถัดไป</span>
+            <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="notiModal2" aria-hidden="true" aria-labelledby="notiModalLabel2" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="notiModalLabel2">(ข้อความต้อนรับ)</h1>
+        </div>
+        <div class="modal-body">
+          <p>Modal 2</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--icon" data-bs-target="#notiModal3" data-bs-toggle="modal">
+            <span class="btn__title">ถัดไป</span>
+            <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="notiModal3" aria-hidden="true" aria-labelledby="notiModalLabel3" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="notiModalLabel3">(ข้อความต้อนรับ)</h1>
+        </div>
+        <div class="modal-body">
+          <p>Last slide</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
+            <span class="btn__title">เริ่มค้นหา</span>
+            <img class="btn__icon" src="./asset/search-white.svg" alt="">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <!-- End Modal -->
+
+
+  <section class="section">
+    <div class="btn btn--offcanvas" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Filter</div>
+
+    <div class="offcanvas offcanvas--content offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+      
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+      <div class="offcanvas-header">
+        <img class="offcanvas__logo" src="./asset/logo.jpg">
+        <h1 class="offcanvas__title">แผนที่สถานบริการยุติ<span class="d-inline-block">การตั้งครรภ์</span><span class="d-inline-block">ในประเทศไทย</span> EDIT</h1>
+      </div>
+
+      <div class="offcanvas-body">
+
+        <div class="offcanvas__filter">
+          <form class="form">
+            <div class="container-fluid px-0">
+              <div class="row">
+                <div class="col-lg-8 col-xl-9 order-lg-1">
+                  <div class="form-group">
+                    <input class="form-input" type="text" id="search" placeholder="ค้นหาจังหวัด">
+                  </div>
+                </div>
+                <div class="col-lg-6 col-xl-4 order-lg-3">
+                  <div class="form-group">
+                    <div class="form-label">
+                      อายุครรภ์ (สัปดาห์)
+                      <button type="button" class="btn btn--preg" data-bs-toggle="popover" data-bs-html="true" data-bs-content="ไม่รู้อายุครรภ์ใช่มั้ย ? <a href='#' target='_blank'>กดคำนวณตรงนี้</a>">?</button>
+                    </div>
+                    <div class="form-select__container">
+                      <select class="form-select" name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
+                        <option value="20">มากกว่า 20</option>
+                        <option value="12">มากกว่า 12</option>
+                        <option value="9" selected>ต่ำกว่า 12</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-xl-4 order-lg-4">
+                  <div class="form-group">
+                    <div class="form-label">ราคา</div>
+                    <div class="form-select__container">
+                      <select class="form-select" name="price" id="price-filter" placeholder="ค่าบริการ">
+                        <option value="all" selected>ทั้งหมด</option>
+                        <option value="free">ฟรี</option>
+                        <option value="paid">มีค่าบริการ</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 order-lg-5">
+                  <div class="form-group">
+                    <div class="form-label">ประเภท</div>
+                    <div class="form-select__container">
+                      <select class="form-select" name="type" id="type-filter" placeholder="ประเภท">
+                        <option value="gov">รัฐ</option>
+                        <option value="private">เอกชน</option>
+                        <option value="all" selected>รัฐและเอกชน</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 order-lg-6">
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" id="foreigner-med-checkbox" value="y">
+                      <label class="form-check-label">มีบริการสำหรับต่างชาติ</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-xl-3 order-lg-2">
+                  <button class="btn btn--primary" id="search-btn">
+                    <span class="btn__title">ค้นหา</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="offcanvas__result">
+          <div class="block block--noti" id="noti-wrapper">
+            <div class="empty">
+              <img class="noti-search" src="./asset/noti-search.svg">
+            </div>
+            
+            <!-- container for status cards -->
+             <!-- <div class="block__item">
+              <div class="block__title">กรุงเทพฯ มีทั้งสถานบริการรัฐและเอกชน</div>
+              <div class="block__detail">
+                <p class="text-center">หากไม่พบสถานบริการที่สนใจ สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a><span class="d-inline-block">เพื่อขอรับยา</span><span class="d-inline-block">ทางไปรษณีย์</span> <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้นะ</span></p>
+              </div>
+             </div>
+             <div class="block__item block__item-hidden">
+              <div class="block__title">ราชบุรี มีสถานบริการรัฐที่ไม่เปิดเผย</div>
+              <div class="block__detail">
+                <p class="text-center"><a href="#0" target="_blank">ติดต่อทำทาง</a><span class="d-inline-block">เพื่อขอรับยา</span><span class="d-inline-block">ทางไปรษณีย์</span> <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้นะ</span></p>
+              </div>
+             </div>
+             <div class="block__item block__item-unavailable">
+              <div class="block__title">เพชรบูรณ์ ยังไม่มีสถานบริการ</div>
+              <div class="block__detail">
+                <p class="text-center">ไม่เป็นไรนะ เรามีคำแนะนำให้</p>
+                <ul>
+                  <li>ค้นหาในจังหวัดอื่นที่ใกล้เคียง</li>
+                  <li>ปรึกษาทำทางเพื่อขอรับยาทางไปรษณีย์</li>
+                </ul>
+              </div>
+             </div> -->
+          </div>
+
+          <div id="outer-card-wrapper">
+             <!-- container for place cards -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- <div id="content-wrapper"> -->
 
     <!-- SEACRH DETAIL --> 
-    <div id="namelist-wrapper">
+    <!-- <div id="namelist-wrapper">
 
         <div id="title-wrapper">
           <img src="./asset/logo.jpg" width="100px">
@@ -39,22 +226,21 @@
             </div>
               
             <div id="filter-container" class="row-wrapper">
+
+                <div>
+                  <div>อายุครรภ์</div>
+                  <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
+                    <option value="all" selected>ทั้งหมด</option>
+                    <option value=20>มากกว่า 20 สัปดาห์</option>
+                    <option value=12>มากกว่า 12 สัปดาห์</option>
+                  </select>
+                </div>
+                
                 <div>
                   <div>ราคา</div>
                   <select name="price" id="price-filter" placeholder="ค่าบริการ">
-                    <option value="free" selected>ฟรี</option>
-                    <option value="max3000">ไม่เกิน 3,000</option>
-                    <option value="max5000">ไม่เกิน 5,000</option>
-                    <option value="all">ทั้งหมด</option>
-                  </select>
-                </div>
-
-                <div>
-                  <div>อายุครรภ์ที่รับ</div>
-                  <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
-                    <option value=12>เกิน 12</option>
-                    <option value=20>เกิน 20</option>
                     <option value="all" selected>ทั้งหมด</option>
+                    <option value="free">ฟรี</option>
                   </select>
                 </div>
 
@@ -86,15 +272,15 @@
           <div id="noti-wrapper">
             <div class="empty">
               <img class="noti-search" src="./asset/noti-search.svg">
-            </div>
+            </div> -->
             <!-- container for status cards -->
-          </div>
+          <!-- </div>
 
-          <div id="outer-card-wrapper">
+          <div id="outer-card-wrapper"> -->
              <!-- container for place cards -->
-          </div>
+          <!-- </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- PLACE DETAIL -->
     <div id="detail-wrapper" class="">  
@@ -115,12 +301,12 @@
           </div>
           <div>
             <div class="preg-container" >
-                  <img class="icon" src=".\asset\clock.svg"></img>
+                  <img class="icon" src="./asset/clock.svg"></img>
                   <span>รับอายุครรภ์ ไม่เกิน 12 สัปดาห์</span>
             </div>
             <div class="bullet-container">
               <div class="row-wrapper">
-                <img class="icon" src=".\asset\calendar.svg"></img>
+                <img class="icon" src="./asset/calendar.svg"></img>
                 <div>
                   <p>เปิดทำการ วันจันทร์ - ศุกร์ เวลา 8:00- 16:30 น.</p>
                   <p>หยุดวันนักขัตฤกษ์</p>
@@ -128,7 +314,7 @@
               </div>
 
               <div class="row-wrapper">
-                <img class="icon" src=".\asset\phone.svg"></img>
+                <img class="icon" src="./asset/phone.svg"></img>
                 <div>
                   <p>02-229-5803-5 ต่อ 250,<br>251 โทรสาร 02-229-4632</p>
                   <p id="contact-note-margin">
@@ -138,11 +324,11 @@
               </div>
 
               <div class="row-wrapper">
-                <img class="icon" src=".\asset\line.svg"></img>
+                <img class="icon" src="./asset/line.svg"></img>
                 <p>pda.clinic</p>
               </div>
               <div class="row-wrapper">
-                <img class="icon" src=".\asset\letter.svg"></img>
+                <img class="icon" src="./asset/letter.svg"></img>
                 <p>pda@gmail.com</p>
               </div>
           </div>
@@ -150,13 +336,13 @@
           <div id="cont-container">
             <div class="row-wrapper">
               <div class="icon">
-                <img class="bullet-icon" src=".\asset\bullet.svg"></img>
+                <img class="bullet-icon" src="./asset/bullet.svg"></img>
               </div>
               <p>Walk in ได้</p>
             </div>
             <div class="row-wrapper">
               <div class="icon">
-                <img class="bullet-icon" src=".\asset\bullet.svg"></img>
+                <img class="bullet-icon" src="./asset/bullet.svg"></img>
               </div>
               <p>รับส่งต่อทั่วประเทศ</p>
             </div>  
@@ -164,11 +350,11 @@
 
           <div id="warning-wrapper"> 
             <div class="warning-container row-wrapper">
-              <img class="icon" src=".\asset\triangle.svg"></img>
+              <img class="icon" src="./asset/triangle.svg"></img>
               <div>อายุต่ำกว่า 18 ปี ต้องมีผู้ปกครอง</div>
             </div>
             <div class="warning-container row-wrapper">
-              <img class="icon" src=".\asset\triangle.svg"></img>
+              <img class="icon" src="./asset/triangle.svg"></img>
               <div>ไม่มีบริการสำหรับต่างชาติ</div>
             </div>    
           </div>
@@ -214,7 +400,7 @@
   });
 </script>
    
-<script>
+<!-- <script>
 			jQuery('.icons img').each(function () {
 				const $img = jQuery(this);
 				const imgID = $img.attr('id');
@@ -232,13 +418,17 @@
 					'xml',
 				);
 			});
+</script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js" integrity="sha512-TPh2Oxlg1zp+kz3nFA0C5vVC6leG/6mm1z9+mA81MI5eaUVqasPLO8Cuk4gMF4gUfP5etR73rgU/8PNMsSesoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js" integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  window.addEventListener('load', () => {
+    if (document.getElementById('notiModal')) {
+      const notiModal = new bootstrap.Modal(document.getElementById('notiModal'));
+      notiModal.show();
+    }
+  });
 </script>
 </body>
 </html>
-
-
-
-
-
-
-

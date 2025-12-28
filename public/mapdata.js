@@ -2,7 +2,7 @@ var simplemaps_countrymap_mapdata={
   main_settings: {
    //General settings
     width: "responsive", //'700' or 'responsive'
-    background_color: "#FFFFFF",
+    background_color: "#FFFFFF", 
     background_transparent: "yes",
     border_color: "#ffffff",
     
@@ -43,7 +43,7 @@ var simplemaps_countrymap_mapdata={
     //Zoom settings
     zoom: "yes",
     manual_zoom: "no",
-    back_image: "yes",
+    back_image: "no",
     initial_back: "no",
     initial_zoom: "-1",
     initial_zoom_solo: "no",
