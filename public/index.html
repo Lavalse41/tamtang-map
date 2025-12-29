@@ -21,7 +21,7 @@
 
 <body>  
 
-  <!-- Start Modal -->
+  <!-- Start Welcome Modal -->
   <!-- <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -82,15 +82,61 @@
       </div>
     </div>
   </div> -->
-  <!-- End Modal -->
+  <!-- End Welcome Modal -->
+
+
+
+  <!-- Start Preg Calculator Modal -->
+  <div class="modal modal--pregcal fade" id="pregCalModal" aria-hidden="true" aria-labelledby="pregCalModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title fs-5" id="pregCalModalLabel">เลือกวันแรกที่ประจำเดือนมาครั้งล่าสุด </div>
+        </div>
+        <div class="modal-body">
+          <div class="outer-container">
+              <form class="form" action="">
+                <div class="container-fluid px-0">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="form-group">
+                        <input class="form-input" type="date" id="start" name="start" value="" min="" max="">
+                      </div>
+                    </div>
+                    <div class="col-12 d-none">
+                      <div class="form-group">
+                        <div class="form-label">วันสุดท้ายที่ประจำเดือนมา</div>
+                        <input class="form-input" type="date" id="end" name="end" value="" min="" max="">
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="result mt-3 mb-4">
+                        <p>อายุครรภ์ปัจจุบันของคุณ คือ</p>
+                        <p class="highlight" id="preg-res"></p>
+                        <p class="note">*หมายเหตุ: เป็นการคำนวณโดยประมาณ กรุณาตรวจอายุครรภ์ที่สถานรับบริการอีกครั้งเพื่อความถูกต้อง</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+          </div>
+          <button type="button" class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
+            <span class="btn__title">กลับไปค้นหา</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Preg Calculator Modal -->
+  
 
 
   <section class="section">
-    <div class="btn btn--offcanvas" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Filter</div>
-
-    <div class="offcanvas offcanvas--content offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+    <!-- Search Offcanvas -->
+    <div class="offcanvas offcanvas--content offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasMain" aria-labelledby="offcanvasMainLabel">
       
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
+       <div class="btn btn--offcanvas" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMain" aria-controls="offcanvasMain">Filter</div>
 
       <div class="offcanvas-header">
         <img class="offcanvas__logo" src="./asset/logo.jpg">
@@ -108,11 +154,11 @@
                     <input class="form-input" type="text" id="search" placeholder="ค้นหาจังหวัด">
                   </div>
                 </div>
-                <div class="col-lg-6 col-xl-4 order-lg-3">
+                <div class="col-xl-6 order-lg-3">
                   <div class="form-group">
                     <div class="form-label">
                       อายุครรภ์ (สัปดาห์)
-                      <button type="button" class="btn btn--preg" data-bs-toggle="popover" data-bs-html="true" data-bs-content="ไม่รู้อายุครรภ์ใช่มั้ย ? <a href='#' target='_blank'>กดคำนวณตรงนี้</a>">?</button>
+                      <button type="button" class="btn btn--preg" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-content="ไม่รู้อายุครรภ์ใช่มั้ย ? <a href='#' data-bs-toggle='modal' data-bs-target='#pregCalModal'>กดคำนวณตรงนี้</a>">?</button>
                     </div>
                     <div class="form-select__container">
                       <select class="form-select" name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
@@ -123,19 +169,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-6 col-xl-4 order-lg-4">
-                  <div class="form-group">
-                    <div class="form-label">ราคา</div>
-                    <div class="form-select__container">
-                      <select class="form-select" name="price" id="price-filter" placeholder="ค่าบริการ">
-                        <option value="all" selected>ทั้งหมด</option>
-                        <option value="free">ฟรี</option>
-                        <option value="paid">มีค่าบริการ</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-xl-4 order-lg-5">
+                <div class="col-xl-6 order-lg-4">
                   <div class="form-group">
                     <div class="form-label">ประเภท</div>
                     <div class="form-select__container">
@@ -143,6 +177,18 @@
                         <option value="gov">รัฐ</option>
                         <option value="private">เอกชน</option>
                         <option value="all" selected>รัฐและเอกชน</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 order-lg-5">
+                  <div class="form-group">
+                    <div class="form-label">การใช้สิทธิ์ประกันสังคม / บัตรทอง</div>
+                    <div class="form-select__container">
+                      <select class="form-select" name="price" id="price-filter" placeholder="ค่าบริการ">
+                        <option value="all" selected>ทั้งหมด</option>
+                        <option value="free">ใช้สิทธิได้</option>
+                        <option value="paid">ใช้สิทธิไม่ได้</option>
                       </select>
                     </div>
                   </div>
@@ -204,193 +250,181 @@
       </div>
 
     </div>
-  </section>
 
-  <!-- <div id="content-wrapper"> -->
-
-    <!-- SEACRH DETAIL --> 
-    <!-- <div id="namelist-wrapper">
-
-        <div id="title-wrapper">
-          <img src="./asset/logo.jpg" width="100px">
-          <div>แผนที่สถานบริการยุติการตั้งครรภ์ในประเทศไทย EDIT</div>
-        </div>
-        
-        <div class="column-wrapper line-gap-m">
-
-          <div class="column-wrapper line-gap-s">
-
-            <div class="row-wrapper">
-              <input type="text" id="search" placeholder="ค้นหาจังหวัด">
-              <button id="search-btn">ค้นหา</button>
-            </div>
-              
-            <div id="filter-container" class="row-wrapper">
-
-                <div>
-                  <div>อายุครรภ์</div>
-                  <select name="preg-week" id="week-filter" placeholder="อายุครรภ์ที่รับ">
-                    <option value="all" selected>ทั้งหมด</option>
-                    <option value=20>มากกว่า 20 สัปดาห์</option>
-                    <option value=12>มากกว่า 12 สัปดาห์</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <div>ราคา</div>
-                  <select name="price" id="price-filter" placeholder="ค่าบริการ">
-                    <option value="all" selected>ทั้งหมด</option>
-                    <option value="free">ฟรี</option>
-                  </select>
-                </div>
-
-                <div>
-                  <div>ประเภท</div>
-                  <select name="type" id="type-filter" placeholder="ประเภท">
-                    <option value="gov">รัฐ</option>
-                    <option value="private">เอกชน</option>
-                    <option value="all" selected>รัฐและเอกชน</option>
-                  </select>
-                </div>
-
-                <div class="filter-outer-wrapper">
-                  <span class="filter-btn">
-                    <div class="icons">
-                    <img class="filter-icon" src="./asset/filter.svg">
-                  </span>
-                  <div id="filter-select-wrapper">
-                    <div class="row-wrapper">
-                      <input type="checkbox" id="foreigner-med-checkbox" value="y">
-                      <span>มีบริการสำหรับต่างชาติ</span>
-                    </div>
-                  </div>
-                </div>
-            </div>  
-          </div>
-        </div>
-
-          <div id="noti-wrapper">
-            <div class="empty">
-              <img class="noti-search" src="./asset/noti-search.svg">
-            </div> -->
-            <!-- container for status cards -->
-          <!-- </div>
-
-          <div id="outer-card-wrapper"> -->
-             <!-- container for place cards -->
-          <!-- </div>
-        </div>
-    </div> -->
-
-    <!-- PLACE DETAIL -->
-    <div id="detail-wrapper" class="">  
-      <div id="back-btn">
-        <span><i class="fa-solid fa-arrow-left fa-lg"></i></span>
-      </div>
-
-      <div class="detail-img"></div>
+    <!-- Detail Offcanvas -->
+    <div class="offcanvas offcanvas--detail offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasDetail" aria-labelledby="offcanvasDetailLabel">
       
-      <div class="detail-container">
-          <div class="detail-title">
-            <p class="title-th">
-              สมาคมพัฒนาประชากรและชุมชน สาขากรุงเทพ
-            </p>
-            <p class="title-en">
-              Population and Community Development Association
-            </p>
-          </div>
-          <div>
-            <div class="preg-container" >
-                  <img class="icon" src="./asset/clock.svg"></img>
-                  <span>รับอายุครรภ์ ไม่เกิน 12 สัปดาห์</span>
+      <button class="btn btn--icon" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMain" aria-controls="offcanvasMain">
+        <img class="btn__icon" src="./asset/chevron-left.svg" alt="">
+        <div class="btn__title">ย้อนกลับ</div>
+      </button>
+
+      <div class="offcanvas-body">
+        <div class="offcanvas__header">
+          <!-- <h2 class="offcanvas__title-th">สมาคมพัฒนาประชากรและชุมชน สาขากรุงเทพ</h2>
+          <h2 class="offcanvas__title-en">Population and Community Development Association</h2>
+          <div class="offcanvas__map">
+            <div class="btn btn--primary-outline" href="#0" target="_blank">
+              <img class="btn__icon" src="./asset/location.svg" alt="">
+              <span class="btn__title">ดูตำแหน่งบน Google Map</span>
             </div>
-            <div class="bullet-container">
-              <div class="row-wrapper">
-                <img class="icon" src="./asset/calendar.svg"></img>
-                <div>
-                  <p>เปิดทำการ วันจันทร์ - ศุกร์ เวลา 8:00- 16:30 น.</p>
-                  <p>หยุดวันนักขัตฤกษ์</p>
-                </div>
-              </div>
+          </div> -->
+        </div>
 
-              <div class="row-wrapper">
-                <img class="icon" src="./asset/phone.svg"></img>
-                <div>
-                  <p>02-229-5803-5 ต่อ 250,<br>251 โทรสาร 02-229-4632</p>
-                  <p id="contact-note-margin">
-                  *สอบถามการเดินทางเพื่อป้องกันการถูกหลอกลวงไปที่อื่นระหว่างเดินทาง 062-2591299 (8.00-16.30 น.)
-                  </p>
-                </div>
-              </div>
+        <div class="offcanvas__result">
+          <!-- <div class="media media--place-contact">
 
-              <div class="row-wrapper">
-                <img class="icon" src="./asset/line.svg"></img>
+            <div class="media__item media__item-highlight">
+              <img class="media__icon" src="./asset/calendar.svg" alt="">
+              <div class="media__detail">
+                <p>รับอายุครรภ์ ไม่เกิน 12 สัปดาห์</p>
+              </div>
+            </div>
+
+            <div class="media__item">
+              <img class="media__icon" src="./asset/clock.svg" alt="">
+              <div class="media__detail">
+                <p>เปิดทำการ วันจันทร์ - ศุกร์ เวลา 8:00 - 16:30 น. </p>
+                <p>หยุดวันนักขัตฤกษ์</p>
+              </div>
+            </div>
+
+            <div class="media__item">
+              <img class="media__icon" src="./asset/phone.svg" alt="">
+              <div class="media__detail">
+                <p>02-229-5803-5 ต่อ 250, 251</p>
+                <p>โทรสาร 02-229-4632</p>
+                <p>หยุดวันนักขัตฤกษ์</p>
+              </div>
+            </div>
+
+            <div class="media__item">
+              <img class="media__icon" src="./asset/line.svg" alt="">
+              <div class="media__detail">
                 <p>pda.clinic</p>
               </div>
-              <div class="row-wrapper">
-                <img class="icon" src="./asset/letter.svg"></img>
-                <p>pda@gmail.com</p>
-              </div>
-          </div>
-
-          <div id="cont-container">
-            <div class="row-wrapper">
-              <div class="icon">
-                <img class="bullet-icon" src="./asset/bullet.svg"></img>
-              </div>
-              <p>Walk in ได้</p>
             </div>
-            <div class="row-wrapper">
-              <div class="icon">
-                <img class="bullet-icon" src="./asset/bullet.svg"></img>
+
+            <div class="media__item">
+              <img class="media__icon" src="./asset/letter.svg" alt="">
+              <div class="media__detail">
+                <p>pda@pda.or.th</p>
               </div>
-              <p>รับส่งต่อทั่วประเทศ</p>
-            </div>  
-          </div>
-
-          <div id="warning-wrapper"> 
-            <div class="warning-container row-wrapper">
-              <img class="icon" src="./asset/triangle.svg"></img>
-              <div>อายุต่ำกว่า 18 ปี ต้องมีผู้ปกครอง</div>
             </div>
-            <div class="warning-container row-wrapper">
-              <img class="icon" src="./asset/triangle.svg"></img>
-              <div>ไม่มีบริการสำหรับต่างชาติ</div>
-            </div>    
-          </div>
+
+          </div> -->
+          
+          <!-- <div class="media media--notice">
+            <div class="media__item media__item-accept">
+              <img class="media__icon" src="./asset/circle-check.svg" alt="">
+              <div class="media__title">Walk in ได้</div>
+            </div>
+            <div class="media__item media__item-accept">
+              <img class="media__icon" src="./asset/circle-check.svg" alt="">
+              <div class="media__title">รับส่งต่อ ทั่วประเทศ</div>
+            </div>
+            <div class="media__item media__item-warn">
+              <img class="media__icon" src="./asset/triangle.svg" alt="">
+              <div class="media__title">อายุต่ำกว่า 15 ปี ต้องมีผู้ปกครอง</div>
+            </div>
+            <div class="media__item media__item-warn">
+              <img class="media__icon" src="./asset/triangle.svg" alt="">
+              <div class="media__title">ไม่มีบริการสำหรับต่างชาติ</div>
+            </div>
+            <div class="media__item media__item-warn">
+              <img class="media__icon" src="./asset/triangle.svg" alt="">
+              <div class="media__title">รับเฉพาะกรณีข่มขืน, ตัวอ่อนพิการ, วัยรุ่น</div>
+            </div>
+          </div> -->
+
+          <!-- <div class="offcanvas__service">
+            <div class="offcanvas__subtitle">บริการยุติการตั้งครรภ์</div>
+
+            <ul class="nav nav--service nav-tabs" id="serviceTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="service-1" data-bs-toggle="tab" data-bs-target="#service-1-pane" type="button" role="tab" aria-controls="service-1-pane" aria-selected="true">ราคาคนไทย</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="service-2" data-bs-toggle="tab" data-bs-target="#service-2-pane" type="button" role="tab" aria-controls="service-2-pane" aria-selected="false">ราคาคนต่างชาติ</button>
+              </li>
+            </ul>
+
+            <div class="tab-content tab-content--service" id="serviceTabContent">
+              <div class="tab-pane fade show active" id="service-1-pane" role="tabpanel" aria-labelledby="service-1" tabindex="0">
+                <div class="table-responsive">
+                  <table class="table table--service">
+                    <thead>
+                      <tr>
+                        <th>ประเภท</th>
+                        <th>ค่าบริการ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>ดูดสูญญากาศ</td>
+                        <td>6,000 บาท (กรณีใช้ยาชา) 4,500 บาท (กรณีไม่ใช้ยาชา)</td>
+                      </tr>
+                      <tr>
+                        <td>ยา *มีส่งทางไปรษณีย์</td>
+                        <td>งดบริการชั่วคราว</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="service-2-pane" role="tabpanel" aria-labelledby="service-2" tabindex="0">
+                <div class="table-responsive">
+                  <table class="table table--service">
+                    <thead>
+                      <tr>
+                        <th>ประเภท</th>
+                        <th>ค่าบริการ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>ดูดสูญญากาศ</td>
+                        <td>6,000 บาท (กรณีใช้ยาชา) 4,500 บาท (กรณีไม่ใช้ยาชา)</td>
+                      </tr>
+                      <tr>
+                        <td>ยา *มีส่งทางไปรษณีย์</td>
+                        <td>งดบริการชั่วคราว</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- <div class="offcanvas__note">
+            <div class="offcanvas__subtitle">หมายเหตุ</div>
+            <p></p>
+          </div> -->
+
+          <!-- <div class="offcanvas__highlight">หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ  สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a>เพื่อขอรับความช่วยเหลือได้ค่ะ</div> -->
+
+          <!-- <div class="offcanvas__other-service">
+            <div class="offcanvas__subtitle">บริการอื่นๆ</div>
+            <p class="mb-2">(กรุณาสอบถามราคาจากคลินิก)</p>
+            <ul>
+              <li>ฝังยาคุมกำเนิด 300 บาท</li>
+              <li>อัลตราซาวด์ 500 บาท</li>
+            </ul>
+          </div> -->
+
         </div>
 
-        <div class="table-container">
-            <p class="header">บริการยุติการตั้งครรภ์</p>
-            <table>
-              <tr>
-                <th class="method">ประเภท</td>
-                <th class="price">ค่าบริการ</th>
-              </tr>
-            </table>
-            <div id="money-aid-container">
-              <p>หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ สามารถติดต่อทำทางเพื่อขอรับความช่วยเหลือได้ค่ะ</p>
-            </div> 
-        </div>
+      </div>
 
-        <div class="other-service-container">
-          <p class="header">บริการอื่นๆ</p>
-          <p>(กรุณาสอบถามราคาจากคลินิค)</p>
-          <div id="cont-container">
-            <!-- container for other service -->
-          </div>
-        </div>
-        <div>
-          <span><a href="www.google.com">ดูตำแหน่งบน Google Map</a></span>
-        </div>
     </div>
-  </div>
 
-<!-- MAP -->
-<div id="map-wrapper">
-  <div id="simplemap"></div>
-  <div id="map"></div>
-</div>   
+    <!-- MAP -->
+    <div id="map-wrapper">
+      <div id="simplemap"></div>
+      <div id="map"></div>
+    </div>   
+  </section>
  
 <!-- MAP SCRIPT -->
 <script>
