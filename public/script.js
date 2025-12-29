@@ -1,21 +1,22 @@
 // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
-import { initMap } from "./map.js";
-import { goToLocation } from "./map.js";
-import { clearMap } from "./map.js";
+import { initOverviewMap, initProvinceMap } from "./map.js";
 
+// ===============================
+// ✅ default state: เลิกใช้ simplemap
+// ===============================
+$('#simplemap').hide();
+$('#map').show();
 
-//default state
-$('#simplemap').show(); 
-$('#map').hide();  
-//$("#filter-select-wrapper").addClass("hide");
-
-// Please change to Production name later
+//** Please change to Production name later **//
 const API_BASE_URL = 'http://localhost:10008';
 
+// ===============================
+// DOM refs
+// ===============================
 const searchInput = $("#search");
-const weekSelectbox = $("#week-filter")
-const priceSelectbox = $("#price-filter")
-const typeSelectbox = $("#type-filter")
+const weekSelectbox = $("#week-filter");
+const priceSelectbox = $("#price-filter");
+const typeSelectbox = $("#type-filter");
 
 const placeCardWrapper = $("#outer-card-wrapper");
 const notiCardWrapper = $("#noti-wrapper");
@@ -24,30 +25,35 @@ const statusCardWrapper = notiCardWrapper; // ใช้ notiCardWrapper สำ�
 const searchBtn = $("#search-btn");
 // const backBtn = $("#back-btn span");
 
+// ===============================
+// State
+// ===============================
 let centerAndStatusData = {};
+let overviewCentersCache = [];
 
-// function to fetch province list
-const provinceList = await makeProvinceList();    
+// ===============================
+// API helpers
+// ===============================
 async function makeProvinceList() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/wp-json/custom/v1/province`);
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/wp-json/custom/v1/province`);
+    const data = await response.json();
 
     const provinceNames = [...new Set(data.map(item => item.province))];
 
     console.log("provinceNames:", provinceNames);
     return provinceNames;
-    } catch (error) {
+  } catch (error) {
     console.error("Error fetching province data:", error);
     throw error;
   }
-};
+}
 
-// function to fetch center of province and status
+// function to fetch province list
+const provinceList = await makeProvinceList();
+
 async function getProvinceCenterStatus(province) {
   try {
-    //console.log("province: ", province);
-
     const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/center`);
     url.searchParams.set("province", province);
 
@@ -66,13 +72,45 @@ async function getProvinceCenterStatus(province) {
   }
 }
 
-// function to fetch place data based on search
+async function getAllProvinceCenters() {
+  const provinces = Array.isArray(provinceList) ? provinceList : await makeProvinceList();
+  if (!Array.isArray(provinces) || provinces.length === 0) return [];
+
+  const results = await Promise.allSettled(
+    provinces.map(async (p) => {
+      try {
+        const rows = await getProvinceCenterStatus(p);
+        const first = Array.isArray(rows) ? rows[0] : rows;
+        if (!first) return null;
+
+        const lat = Number(first.lat ?? first.center_lat ?? first.latitude);
+        const lng = Number(first.lng ?? first.center_lng ?? first.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+        return {
+          province: first.province ?? p,
+          lat,
+          lng,
+          status: String(first.status ?? '').trim(),
+        };
+      } catch (e) {
+        return null;
+      }
+    })
+  );
+
+  return results
+    .filter(r => r.status === 'fulfilled')
+    .map(r => r.value)
+    .filter(Boolean);
+}
+
 async function getData(province, week, type, foreignerMed, cost_type) {
   const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/place`);
 
   if (province) url.searchParams.set("province", province);
-  if (week) url.searchParams.set("week", week);          // lt12/gt12/gt20
-  if (type) url.searchParams.set("type", type);          // gov/private
+  if (week) url.searchParams.set("week", week); // lt12/gt12/gt20
+  if (type) url.searchParams.set("type", type); // gov/private
   if (cost_type) url.searchParams.set("cost_type", cost_type); // free/paid
   if (foreignerMed) url.searchParams.set("foreignerMed", foreignerMed);
 
@@ -81,37 +119,38 @@ async function getData(province, week, type, foreignerMed, cost_type) {
   return await response.json();
 }
 
-
-// function to fetch service data
 async function getService(place_id) {
   try {
     const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/service`);
-      url.searchParams.set("place_id", place_id);
+    url.searchParams.set("place_id", place_id);
 
-      const response = await fetch(url);
-      const data = await response.json();
-      return data;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Error fetching service data:", error);
     throw error;
   }
 }
 
-// autocomplete for search input
+// ===============================
+// Autocomplete
+// ===============================
 $("#search").autocomplete({
   source: provinceList,
   minLength: 1,
-  select: function(event, ui) {
+  select: function (event, ui) {
     searchInput.val(ui.item.value);
     searchBtn.click();
-    return false; 
+    return false;
   }
 });
 
-// search btn 
+// ===============================
+// Search handler
+// ===============================
 searchBtn.on("click", handleSearch);
 
-// function to handle search province  
 export async function handleSearch(province) {
   let searchedProvince;
 
@@ -253,24 +292,29 @@ export async function handleSearch(province) {
     const provinceData = await getData(searchedProvince, weekValue, typeValue, foreignerMed, priceValue);
     console.log('provinceData : ', provinceData);
 
-    // ✅ 3) map: แสดงเฉพาะเมื่อมีสถานที่
-    if (provinceData && provinceData.length > 0) {
-      $('#simplemap').hide();
-      $('#map').show();
-      initMap(provinceData, centerAndStatusData);
-    } else {
-      $('#simplemap').show();
-      $('#map').hide();
+    // ===============================
+    // ✅ 3) MAP: แสดงตลอด (ไม่ใช้ simplemap แล้ว)
+    // ===============================
+    $('#map').show();
 
+    const safeProvinceData = Array.isArray(provinceData) ? provinceData : [];
+
+    // centerPosition ต้องเป็น object {lat,lng} เท่านั้น (กันส่ง array มาแล้วพัง)
+    const centerPosRaw = Array.isArray(centerAndStatusData) ? centerAndStatusData[0] : centerAndStatusData;
+    const centerPosition = (centerPosRaw && centerPosRaw.lat && centerPosRaw.lng)
+      ? { lat: Number(centerPosRaw.lat), lng: Number(centerPosRaw.lng) }
+      : null;
+
+    initProvinceMap(provinceData, centerAndStatusData);
+
+    // ถ้าไม่มีสถานที่ + ฟิลเตอร์แคบ → เพิ่มข้อความ “ไม่พบจากเงื่อนไข” (แต่ map ยังอยู่)
+    if (!safeProvinceData.length) {
       const hasNarrowFilterOn =
         (typeValueRaw !== 'all') ||
         (priceValueRaw !== 'all') ||
         (foreignerMed === 'y') ||
         (weekValueRaw !== '9'); // 9 = default "ต่ำกว่า 12"
 
-      // ✅ โชว์ก้อนล่างเฉพาะเมื่อ:
-      // - จังหวัดอยู่ในฐาน (provinceInDb)
-      // - และจังหวัดมีสถานบริการอยู่จริง (ไม่ใช่ not_have)
       const hasSomeServiceInProvince = provinceInDb && (normalizedStatus !== 'not_have');
 
       if (hasSomeServiceInProvince && hasNarrowFilterOn) {
@@ -286,21 +330,22 @@ export async function handleSearch(province) {
     }
 
     // ✅ 4) สร้าง place cards
-    if (provinceData && provinceData.length > 0) {
-      for (const key in provinceData) {
-        if (provinceData.hasOwnProperty(key)) {
-          const nameThai = provinceData[key].name_th;
-          const pregWeek = provinceData[key].preg_week;
-          const placeId = provinceData[key].place_id;
-          const cost_type = provinceData[key].cost_type; // free/paid
-          const foreigner_med = provinceData[key].foreigner_med; // y/n
+    if (safeProvinceData && safeProvinceData.length > 0) {
+      for (const key in safeProvinceData) {
+        if (safeProvinceData.hasOwnProperty(key)) {
+          const nameThai = safeProvinceData[key].name_th;
+          const pregWeek = safeProvinceData[key].preg_week;
+          const placeId = safeProvinceData[key].place_id;
+          const cost_type = safeProvinceData[key].cost_type; // free/paid
+          const foreigner_med = safeProvinceData[key].foreigner_med; // y/n
 
-          // let priceText = '';
-          // if (cost_type === 'free') priceText = 'ใช้สิทธิประกันสังคมได้';
-          // else if (cost_type === 'paid') priceText = 'ใช้สิทธิประกันสังคมไม่ได้';
-          const costTypeTagHtml = (String(cost_type).trim() === 'paid') ? `<div class="card__tag warning"><img class="card__tag-icon" src="./asset/triangle.svg" alt="">ใช้สิทธิ์ประกันสังคม / บัตรทองไม่ได้</div>` : '';
+          const costTypeTagHtml = (String(cost_type).trim() === 'paid')
+            ? `<div class="card__tag warning"><img class="card__tag-icon" src="./asset/triangle.svg" alt="">ใช้สิทธิ์ประกันสังคม / บัตรทองไม่ได้</div>`
+            : '';
 
-          const foreignerTagHtml = (String(foreigner_med).trim() === 'y') ? `<div class="card__tag">มีบริการสำหรับต่างชาติ</div>` : '';
+          const foreignerTagHtml = (String(foreigner_med).trim() === 'y')
+            ? `<div class="card__tag">มีบริการสำหรับต่างชาติ</div>`
+            : '';
 
           newCard += `
             <div class="card card--place" data-key="${placeId}">
@@ -341,13 +386,14 @@ export async function handleSearch(province) {
     `;
     statusCardWrapper.html(errCard);
     placeCardWrapper.html("");
-    $('#simplemap').show();
-    $('#map').hide();
+    $('#map').show(); // ✅ map ยังอยู่
   }
 }
 
-/* Popover */
-const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+// ===============================
+// Popover
+// ===============================
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
 const popoverList = [...popoverTriggerList].map(popoverTriggerEl => {
   // Extend the default allow list to include data attributes for modals
   const myAllowList = {
@@ -359,32 +405,31 @@ const popoverList = [...popoverTriggerList].map(popoverTriggerEl => {
     allowList: myAllowList
   });
 });
+
 document.querySelectorAll('.popover-dismiss').forEach(popoverNode => {
   new bootstrap.Popover(popoverNode, { trigger: 'focus' });
 });
 
-
-/* Preg Calculator */
+// ===============================
+// Preg Calculator
+// ===============================
 if ($('#pregCalModal').length) {
-  
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth() + 1; //January is 0
   var yyyy = today.getFullYear();
 
   if (dd < 10) { dd = '0' + dd; }
+  if (mm < 10) { mm = '0' + mm; }
 
-  if (mm < 10) { mm = '0' + mm; } 
-        
   today = yyyy + '-' + mm + '-' + dd;
   $("#start").attr("max", today);
   $("#end").attr("value", today);
-    
+
   function calculatePreg() {
     const startVal = $("#start").val();
     const endVal = $("#end").val();
 
-    // ❌ ถ้ายังเลือกไม่ครบ อย่าคำนวณ
     if (!startVal || !endVal) {
       $("#preg-res").html("");
       return;
@@ -393,7 +438,6 @@ if ($('#pregCalModal').length) {
     const start = new Date(startVal);
     const end = new Date(endVal);
 
-    // ❌ กัน Invalid Date
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       $("#preg-res").html("");
       return;
@@ -406,48 +450,42 @@ if ($('#pregCalModal').length) {
 
     $("#preg-res").html(`${weeks} สัปดาห์ ${days} วัน`);
   }
+
   $("#start").on("change", calculatePreg);
   $("#end").on("change", calculatePreg);
-
-  //reset date
-  // $('#resetButton').on('click', function(){
-  //   $("#start").val("");
-  //   $("#end").val(today);
-  //   $("#preg-res").html("");
-  // });
 }
 
+// ===============================
 // helper: escape กัน XSS / ข้อมูลแปลก ๆ
+// ===============================
 function esc(str) {
   return String(str ?? '').replace(/[&<>"']/g, (m) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[m]));
 }
 
+// ===============================
+// UI builders
+// ===============================
 function buildPlaceContactHtml(data) {
   const pregWeek = data?.preg_week ? `รับอายุครรภ์ ไม่เกิน ${esc(data.preg_week)} สัปดาห์` : '';
-  const openDay  = esc(data?.open_day || '');
+  const openDay = esc(data?.open_day || '');
   const openFrom = esc(data?.open_from || '');
-  const openTo   = esc(data?.open_to || '');
+  const openTo = esc(data?.open_to || '');
   const closedDay = esc(data?.closed_day || '');
 
-  // เวลาเปิดทำการ (ประกอบประโยคแบบยืดหยุ่น)
   let openLine1 = '';
   if (openDay || openFrom || openTo) {
     openLine1 = `เปิดทำการ ${openDay}${(openFrom && openTo) ? ` เวลา ${openFrom} - ${openTo} น.` : ''}`;
   }
 
-  // closed day
   let openLine2 = closedDay ? `${closedDay}` : '';
 
-  // tel / line / email
-  const tel   = esc(data?.tel || '');
-  const line  = esc(data?.line || '');
+  const tel = esc(data?.tel || '');
+  const line = esc(data?.line || '');
   const email = esc(data?.email || '');
 
-  // ถ้าไม่มีอะไรเลย ก็คืนข้อความว่าง
-  const hasAny =
-    pregWeek || openLine1 || openLine2 || tel || line || email;
+  const hasAny = pregWeek || openLine1 || openLine2 || tel || line || email;
 
   if (!hasAny) {
     return `<div class="media"><div class="media__item"><div class="media__detail"><p>-</p></div></div></div>`;
@@ -505,7 +543,6 @@ function buildNoticeHtml(data) {
   const normalItems = [];
   const warnItems = [];
 
-  /* 1) walk_in */
   if (String(data?.walk_in).trim() === 'y') {
     normalItems.push(`
       <div class="media__item media__item-accept">
@@ -515,7 +552,6 @@ function buildNoticeHtml(data) {
     `);
   }
 
-  /* 2) refer_in_cap */
   const referInCap = String(data?.refer_in_cap ?? '').trim();
   if (referInCap !== '') {
     normalItems.push(`
@@ -526,7 +562,6 @@ function buildNoticeHtml(data) {
     `);
   }
 
-  /* 3) under_age */
   const underAge = String(data?.under_age ?? '').trim();
   if (underAge !== '' && underAge !== 'n') {
     warnItems.push(`
@@ -537,7 +572,6 @@ function buildNoticeHtml(data) {
     `);
   }
 
-  /* 4) foreigner_med */
   const foreigner = String(data?.foreigner_med ?? '').trim();
   if (foreigner === 'y') {
     normalItems.push(`
@@ -555,7 +589,6 @@ function buildNoticeHtml(data) {
     `);
   }
 
-  /* 5) เงื่อนไขการรับบริการ */
   const conditionAll = String(data?.condition_all ?? '').trim();
 
   if (conditionAll !== 'y') {
@@ -585,10 +618,8 @@ function buildNoticeHtml(data) {
     }
   }
 
-  // ❌ ไม่มีอะไรเลย → ไม่ต้อง render
   if (normalItems.length === 0 && warnItems.length === 0) return '';
 
-  // ✅ เรียง: ธรรมดา → warn
   return `
     <div class="media media--notice">
       ${normalItems.join('')}
@@ -597,10 +628,12 @@ function buildNoticeHtml(data) {
   `;
 }
 
+// ===============================
 // ===== Service Helpers =====
+// ===============================
 function normalizePriceType(v) {
   const s = String(v ?? '').toLowerCase().trim();
-  if (['foreigner','foreign','expat','en','nonthai','non_thai'].includes(s)) return 'foreigner';
+  if (['foreigner', 'foreign', 'expat', 'en', 'nonthai', 'non_thai'].includes(s)) return 'foreigner';
   return 'thai';
 }
 
@@ -608,7 +641,6 @@ function isY(v) {
   return String(v ?? '').toLowerCase().trim() === 'y';
 }
 
-// เลือก label "ประเภท" จาก join (wp_service_m)
 function getMethodLabel(row) {
   return (
     row?.sm_name_th ||
@@ -621,27 +653,23 @@ function getMethodLabel(row) {
   );
 }
 
-// กรองเฉพาะ service_status = normal (ไม่เอา other)
 function isNormalService(row) {
-  // บางที field อาจมาจาก wp_service_m หรือ wp_service
   const v = String(
     row?.service_status ??
     row?.m_service_status ??
     row?.sm_service_status ??
-    row?.service_type ??    // กันพัง
+    row?.service_type ??
     ''
   ).toLowerCase().trim();
 
   return v === 'normal';
 }
 
-// tr class inactive ถ้า status ของ service เป็น inactive
 function isInactive(row) {
   const v = String(row?.status ?? row?.service_status_flag ?? '').toLowerCase().trim();
   return v === 'inactive';
 }
 
-// group rows -> { thai: Map(sm_id -> {label, costs[], inactive}), foreigner: Map(...) }
 function groupServiceRows(rows) {
   const grouped = { thai: new Map(), foreigner: new Map() };
 
@@ -660,14 +688,12 @@ function groupServiceRows(rows) {
     }
     const obj = bucket.get(smId);
 
-    // ✅ inactive จาก wp_service.status
     if (isInactive(row)) obj.inactive = true;
 
     const costLine = String(row?.cost ?? '').trim();
     if (costLine) obj.costs.push(costLine);
   });
 
-  // ถ้าไม่มี cost และไม่ inactive → ใส่ default
   for (const map of [grouped.thai, grouped.foreigner]) {
     for (const [, v] of map.entries()) {
       if (!v.inactive && (!v.costs || v.costs.length === 0)) {
@@ -715,7 +741,6 @@ function buildServiceSection(placeData, serviceRows) {
 
   const hasForeignerTab = isY(placeData?.has_foreigner_price) && grouped.foreigner.size > 0;
 
-  // ✅ ถ้า has_foreigner_price = n/ว่าง → ตารางเดียว (ราคาไทย)
   if (!hasForeignerTab) {
     return `
       <div class="offcanvas__service">
@@ -737,7 +762,6 @@ function buildServiceSection(placeData, serviceRows) {
     `;
   }
 
-  // ✅ ถ้า has_foreigner_price = y → มีแท็บ ไทย/ต่างชาติ
   return `
     <div class="offcanvas__service">
       <div class="offcanvas__subtitle">บริการยุติการตั้งครรภ์</div>
@@ -794,13 +818,9 @@ function splitNoteToList(note) {
   if (!note) return [];
 
   return note
-    .split(/,\s*-/)              // ตัดตรง ", -"
+    .split(/,\s*-/) // ตัดตรง ", -"
     .map((item, index) => {
-      // หัวข้อแรกอาจไม่มี "-"
-      const text = index === 0
-        ? item
-        : '-' + item;
-
+      const text = index === 0 ? item : '-' + item;
       return text.replace(/^-/, '').trim();
     })
     .filter(Boolean);
@@ -811,7 +831,6 @@ function buildNoteSection(data) {
   if (!rawNote) return '';
 
   const items = splitNoteToList(rawNote);
-
   if (items.length === 0) return '';
 
   return `
@@ -827,9 +846,7 @@ function buildNoteSection(data) {
 function buildHighlightSection() {
   return `
     <div class="offcanvas__highlight">
-        หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ
-        สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a>
-        เพื่อขอรับความช่วยเหลือได้ค่ะ
+      หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ  สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a>เพื่อขอรับความช่วยเหลือได้ค่ะ
     </div>
   `;
 }
@@ -839,7 +856,7 @@ function isOtherService(row) {
     row?.service_type ??
     row?.sm_service_type ??
     row?.m_service_type ??
-    row?.service_status ??      // เผื่อฝั่ง DB ใช้ชื่อ field สลับกัน
+    row?.service_status ??
     row?.sm_service_status ??
     ''
   ).toLowerCase().trim();
@@ -859,14 +876,13 @@ function getOtherServiceLabel(row) {
 
 function normalizeCostForOther(costRaw) {
   const c = String(costRaw ?? '').trim();
-  if (!c || c === '-' ) return ''; // ไม่โชว์ราคา
+  if (!c || c === '-') return '';
   return c;
 }
 
 function buildOtherServiceSection(serviceRows) {
   const rows = Array.isArray(serviceRows) ? serviceRows : [];
 
-  // group by service_id (กันข้อมูลซ้ำจากการ join)
   const map = new Map(); // service_id -> { label, costs[] }
 
   rows.forEach((row) => {
@@ -881,23 +897,19 @@ function buildOtherServiceSection(serviceRows) {
 
     const cost = normalizeCostForOther(row?.cost);
     if (cost) {
-      // กันซ้ำ
       const obj = map.get(serviceId);
       if (!obj.costs.includes(cost)) obj.costs.push(cost);
     }
   });
 
-  if (map.size === 0) return ''; // ไม่มี other → ไม่ต้องโชว์
+  if (map.size === 0) return '';
 
   const lis = Array.from(map.values()).map(item => {
     if (!item.costs.length) {
       return `<li>${esc(item.label)}</li>`;
     }
 
-    // ถ้ามีหลาย cost ให้คั่นด้วย " / "
     const costText = item.costs.map(c => esc(c)).join(' / ');
-
-    // ถ้าข้อมูล cost มีคำว่า "บาท" อยู่แล้ว ไม่ต้องเติมซ้ำ
     const addBaht = !/บาท/.test(costText);
     return `<li>${esc(item.label)} ${costText}${addBaht ? ' บาท' : ''}</li>`;
   }).join('');
@@ -913,22 +925,21 @@ function buildOtherServiceSection(serviceRows) {
   `;
 }
 
-
-// ✅ Click place card -> close main offcanvas + open detail offcanvas + load data + service + render result
+// ===============================
+// Detail offcanvas (place card)
+// ===============================
 $(document).on('click', '.card.card--place #detail-link', async function (e) {
   e.preventDefault();
 
   const placeId = $(this).closest('.card.card--place').data('key');
   if (!placeId) return;
 
-  // ✅ ปิด offcanvasMain ก่อน
   const mainEl = document.getElementById('offcanvasMain');
   if (mainEl) {
     const mainInstance = bootstrap.Offcanvas.getInstance(mainEl);
     if (mainInstance) mainInstance.hide();
   }
 
-  // ✅ เปิด offcanvasDetail
   const detailEl = document.getElementById('offcanvasDetail');
   const detailInstance = bootstrap.Offcanvas.getOrCreateInstance(detailEl);
   detailInstance.show();
@@ -937,7 +948,6 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
   const $header = $detail.find('.offcanvas__header');
   const $result = $detail.find('.offcanvas__result');
 
-  // loading state
   $header.html(`<h2 class="offcanvas__title-th">กำลังโหลด...</h2>`);
   $result.html(`<p>กำลังโหลดข้อมูล...</p>`);
 
@@ -948,18 +958,16 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
   serviceUrl.searchParams.set('place_id', placeId);
 
   try {
-    // ✅ ดึงพร้อมกัน
     const [placeRes, serviceRes] = await Promise.all([
       fetch(placeUrl),
       fetch(serviceUrl),
     ]);
 
     const data = await placeRes.json();
-    const services = await serviceRes.json(); // มาจาก join: wp_service + wp_service_m + wp_cost
+    const services = await serviceRes.json();
 
     const mapUrl = data?.map_url || data?.google_map_url || data?.gmaps_url || data?.map || '#0';
 
-    // header
     $header.html(`
       <h2 class="offcanvas__title-th">${esc(data?.name_th || '-')}</h2>
       <h2 class="offcanvas__title-en">${esc(data?.name_en || '')}</h2>
@@ -971,14 +979,13 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
       </div>
     `);
 
-    // result: contact + notice + service
     const contactHtml = buildPlaceContactHtml(data);
-    const noticeHtml  = buildNoticeHtml(data);
+    const noticeHtml = buildNoticeHtml(data);
     const serviceHtml = buildServiceSection(data, Array.isArray(services) ? services : []);
     const noteHtml = buildNoteSection(data);
     const highlightHtml = buildHighlightSection();
     const otherServiceHtml = buildOtherServiceSection(services);
-    
+
     $result.html(`
       ${contactHtml}
       ${noticeHtml}
@@ -995,318 +1002,116 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
   }
 });
 
+// ===============================
+// Offcanvas helpers
+// ===============================
+function isOffcanvasShown(el) {
+  return !!el && el.classList.contains('show');
+}
 
-function disableOffcanvasMainOnMobile() {
-  const el = document.getElementById('offcanvasMain');
+function showOffcanvas(el) {
   if (!el) return;
+  bootstrap.Offcanvas.getOrCreateInstance(el).show();
+}
 
-  if (window.innerWidth < 575) {
-    el.classList.remove('show');
-    el.style.display = 'none';
-  } else {
-    el.style.display = '';
+function hideOffcanvas(el) {
+  if (!el) return;
+  const inst = bootstrap.Offcanvas.getOrCreateInstance(el);
+  inst.hide();
+}
+
+// ===============================
+// Back to overview
+// ===============================
+function resetSearchUI() {
+  // 1) เคลียร์ช่องค้นหา
+  $('#search').val('');
+
+  // 2) รีเซ็ตฟิลเตอร์กลับค่า default (ปรับ value ให้ตรงกับ option ของคุณ)
+  $('#week-filter').val('9');    // default: ต่ำกว่า 12
+  $('#price-filter').val('all'); // default: ทั้งหมด
+  $('#type-filter').val('all');  // default: ทั้งหมด
+  $('#foreigner-med-checkbox').prop('checked', false);
+
+  // 3) เคลียร์ผลการค้นหา/การ์ด
+  $('#outer-card-wrapper').html('');
+  $('#noti-wrapper').html('');
+
+  // (ถ้าคุณมี element อื่นที่ต้องเคลียร์ เพิ่มได้ตรงนี้)
+}
+
+async function backToProvinceOverview() {
+  const mainEl = document.getElementById('offcanvasMain');
+  const detailEl = document.getElementById('offcanvasDetail');
+
+  // เคลียร์ฟิล+ผลลัพธ์ก่อน
+  resetSearchUI();
+
+  // 0) ปิด detail ถ้าเปิดอยู่
+  if (isOffcanvasShown(detailEl)) {
+    hideOffcanvas(detailEl);
+  }
+
+  // 1) เปิด main ถ้าปิดอยู่ (รองรับกรณี mobile เคย display:none)
+  if (mainEl) {
+    if (window.innerWidth < 575) mainEl.style.display = '';
+    if (!isOffcanvasShown(mainEl)) showOffcanvas(mainEl);
+  }
+
+  // 2) กลับไปโหมด Overview Map (จังหวัดที่มีสถานบริการเท่านั้น)
+  try {
+    if (!Array.isArray(overviewCentersCache) || overviewCentersCache.length === 0) {
+      overviewCentersCache = await getAllProvinceCenters();
+    }
+
+    await initOverviewMap(overviewCentersCache, (provinceName) => {
+      $('#search').val(provinceName);
+      handleSearch(provinceName);
+    });
+
+  } catch (err) {
+    console.error('backToProvinceOverview error:', err);
   }
 }
 
-disableOffcanvasMainOnMobile();
-window.addEventListener('resize', disableOffcanvasMainOnMobile);
+/* Back to map overview button */
+document.getElementById('map-back-button')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  await backToProvinceOverview();
+});
 
-
-
-
-// function to handle place card click to see detail
-// placeCardWrapper.on("click", ".place-card-wrapper", async function(event) {
-//   console.log("see detail clicked");
-  
-//   if ($("#detail-wrapper").css("margin-left") === '-890px') {
-//     $("#detail-wrapper").animate({"margin-left": '+=890px'},1000);
-//  }
- 
-//   const card = $(this).closest(".place-card-wrapper");
-//   const key = card.data("key");
-//   console.log("key:", key);
-
-//   const placeUrl = new URL(`${API_BASE_URL}/wp-json/custom/v1/data`);
-//   placeUrl.searchParams.set("place_id", key); 
-//   let data;
-
-//   const serviceUrl = new URL(`${API_BASE_URL}/wp-json/custom/v1/service`);
-//   serviceUrl.searchParams.set("place_id", key);
-//   let service;
-
-//   try {
-//     const response = await fetch(placeUrl);
-//     data = await response.json();
-//     console.log("data:", data);
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//   }
-
-//   try {
-//     const response = await fetch(serviceUrl);
-//     service = await response.json();
-//     console.log("service", service);
-//   } catch (error) {
-//     console.error("Error fetching service:", error);
-//   }
-
-//   //add Detail Info
-
-//   const detailContainer = $(".offcanvas-body");
-
-//   let newDetail = "";
-//   let goodInfoHtml = "";
-//   let badInfoHtml = "";
-
-//   if (data.walk_in === 'y') { 
-//     goodInfoHtml += `
-//      <div class="row-wrapper">
-//         <div class="icon">
-//         <img class="bullet-icon" src="./asset/bullet.svg"></img>
-//         </div>
-//         <p>Walk in ได้</p>
-//      </div>
-//     `
-//   }
-//   if (data.refer_in_cap !== 'n') {
-//     goodInfoHtml += `
-//     <div class="row-wrapper">
-//         <div class="icon">
-//         <img class="bullet-icon" src="./asset/bullet.svg"></img>
-//         </div>
-//       <p>รับส่งต่อ${data.refer_in_cap}</p>
-//     </div>  
-//     `
-//   }
-
-//   if (data.under_age !== 'n') {
-//     badInfoHtml += `
-//     <div class="warning-container row-wrapper">
-//         <img class="icon" src="./asset/triangle.svg"></img>
-//         <div>อายุต่ำกว่า ${data.under_age} ปี ต้องมีผู้ปกครอง</div>
-//     </div>
-//     `
-//   }
-
-//   if (data.foreigner_med === 'n') {
-//     badInfoHtml += `
-//     <div class="warning-container row-wrapper">
-//         <img class="icon" src="./asset/triangle.svg"></img>
-//         <div>ไม่มีบริการสำหรับต่างชาติ</div>
-//     </div>    
-//     `
-//   }
-
-//   newDetail += `
-//       <div class="detail-title">
-//         <p class="title-th">
-//           ${data.name_th}
-//         </p>
-//         <p class="title-en">
-//           ${data.name_en}
-//         </p>
-//       </div>
-
-//       <div>
-//         <div class="preg-container" >
-//             <img class="icon" src="./asset/clock.svg"></img>
-//             <span>รับอายุครรภ์ ไม่เกิน ${data.preg_week} สัปดาห์</span>
-//         </div>
-
-//         <div class="bullet-container">
-//             <div class="row-wrapper">
-//               <img class="icon" src="./asset/calendar.svg"></img>
-//               <div>
-//                 <p>เปิดทำการ ${data.open_day} เวลา ${data.open_from} - ${data.open_to} น.</p>
-//                 <p>หยุด${data.closed_day}</p>
-//               </div>
-//             </div> 
-
-//             <div class="row-wrapper">
-//                 <img class="icon" src="./asset/phone.svg"></img>
-//                 <div>
-//                   <p>${data.tel}</p>
-//                   <p id="contact-note-margin">
-//                   *${data.tel_remark}
-//                   </p>
-//                 </div>
-//             </div>
-
-//             <div class="row-wrapper">
-//                 <img class="icon" src="./asset/line.svg"></img>
-//                 <p>${data.line}</p>
-//             </div>
-//             <div class="row-wrapper">
-//                 <img class="icon" src="./asset/letter.svg"></img>
-//                 <p>${data.email}</p>
-//             </div>
-//           </div>
-
-//           <div id="cont-container">
-//             ${goodInfoHtml}
-//           </div>
-
-//           <div id="warning-wrapper"> 
-//             ${badInfoHtml}
-//           </div>
-//         </div>
-//         <div class="table-container">
-//             <p class="header">บริการยุติการตั้งครรภ์</p>
-//             <table>
-//             </table>
-//             <div id="money-aid-container">
-//               <p>หากไม่มีเงินเพียงพอในการจ่ายค่าบริการ สามารถติดต่อทำทางเพื่อขอรับความช่วยเหลือได้ค่ะ</p>
-//             </div> 
-//         </div>
-//         <div class="other-service-container">
-//           <p class="header">บริการอื่นๆ</p>
-//           <p>(กรุณาสอบถามราคาจากคลินิค)</p>
-//           <div id="cont-container">
-//           </div>
-//         </div>
-//         <div>
-//           <span><a href="www.google.com">ดูตำแหน่งบน Google Map</a></span>
-//         </div>
-//       </div>
-//     </div>
-//   `;
-
-//   detailContainer.html(newDetail);
-
-//   //add Service Info
-
-//   const detailService = $(".table-container table");
-  
-//   let serviceThead = `<tr>
-//                 <th class="method">ประเภท</td>
-//                 <th class="price">ค่าบริการ</th>
-//               </tr>`;
-//   let newService = "";
-//   let newMed = "";
-//   let newMVA = "";
-
-//   if (service) {
-//   const medFound = service.some(item => item.sm_id === "2");
-//   const mvaFound = service.some(item => item.sm_id === "1");
-  
-//   function loopMVA(service) {
-//     let allCost = "";
-
-//     //choose only 'MVA' method (sm_id = 1)
-//     service.filter(item => String(item.sm_id) === '1')
-//           .forEach(i => { 
-//           allCost += i.cost
-//           allCost += "<br>"
-//           });
-
-//     return allCost;
-//   }
-
-//   function findMed(service) {
-//     let med = "";
-//     //choose only 'Med' method (sm_id = 2)
-//     service.filter(item => String(item.sm_id) === '2')
-//     return med;
-//   }
-
-//   const mvaCost = loopMVA(service);
-//   const medCost = findMed(service);
-  
-//     if (!medFound) {
-//       console.log("med not found :(")
-//       newMed += `
-//         <tr class="unavailable">
-//           <td scope="row">ยา</td>
-//           <td colspan="4">งดบริการชั่วคราว</td>
-//         </tr>
-//       `;
-//     } else {
-//       console.log("med found!")
-//      newMed += `
-//         <tr class="unavailable">
-//           <td scope="row">ยา</td>
-//           <td colspan="4">${medCost}</td>
-//         </tr>
-//       `;
-//     }
-
-//     if (!mvaFound) {
-//       console.log("mva not found :(")
-//       newMVA += `
-//         <tr class="unavailable">
-//           <td scope="row">ดูดสุญญากาศ</td>
-//           <td colspan="4">งดบริการชั่วคราว</td>
-//         </tr>
-//       `;
-//     } else {
-//       console.log("mva found :(");
-//       console.log(mvaCost);
-    
-//     newMVA += `
-//         <tr class="">
-//           <td scope="row">ดูดสุญญากาศ</td>
-//           <td colspan="4">${mvaCost}</td>
-//         </tr>
-//       `;
-//     }
-//   }
-
-//   newService = serviceThead + newMed + newMVA;
-
-//   detailService.html(newService);
-
-//   //add Other Service Info
-
-//   const detailOtherService = $(".other-service-container #cont-container");
-//   let newOtherService = "";
-
-//   function loopOtherService(service) {
-//     console.log("show other service");
-//     let otherElement = "";
-
-//       service.filter(item => String(item.type) === 'other')
-//              .forEach(i => { 
-//               otherElement += 
-//               `<div class="row-wrapper">
-//                   <div class="icon">
-//                     <img class="bullet-icon" src="./asset/primary-bullet.svg"></img>
-//                   </div>
-//                   <p>${i.name}</p>
-//               </div>`
-//             });
-
-//     console.log(otherElement);
-
-//     return otherElement;
-//   }
-  
-//   newOtherService = loopOtherService(service);
-
-//   // let newOtherService = "";
-//   // newOtherService = `<div class="row-wrapper">
-//   //                       <div class="icon">
-//   //                           <img class="bullet-icon" src="./asset/primary-bullet.svg"></img>
-//   //                       </div>
-//   //                       <p>อัลตราซาวด์</p>
-//   //                   </div>`;
-
-//   detailOtherService.html(newOtherService);
-
-// });
-
-// ==== BUTTON ====
-
-//filter btn
-// $(".filter-btn").on("click", function() {
-//   console.log("filter clicked");
-// });
-
-
-
-// back btn to name list
-// backBtn.on("click", ()=> {
-//     $("#detail-wrapper").animate({"margin-left": '-=890px'},1000);
-//     clearMap(centerAndStatusData);
-// });
-
+// ===============================
+// Expose
+// ===============================
 window.handleSearch = handleSearch;
+
+// ===============================
+// Boot: overview map
+// ===============================
+(async function bootOverviewMap() {
+  try {
+    // ❌ เลิกใช้ simplemap
+    $('#simplemap').hide();
+    $('#map').show();
+
+    // ดึง center ของทุกจังหวัด
+    const centers = await getAllProvinceCenters();
+    overviewCentersCache = centers;
+    console.log('centers count:', centers.length, centers);
+
+    // เรนเดอร์ map โหมด overview
+    // คลิกจังหวัด → เรียก handleSearch()
+    await initOverviewMap(centers, (provinceName) => {
+      console.log('click province:', provinceName);
+
+      // ใส่ชื่อจังหวัดลง input
+      $('#search').val(provinceName);
+
+      // เรียกค้นหาจังหวัดนั้น
+      handleSearch(provinceName);
+    });
+
+  } catch (err) {
+    console.error('bootOverviewMap error:', err);
+  }
+})();

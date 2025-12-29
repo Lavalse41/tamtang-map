@@ -121,6 +121,7 @@
               </form>
           </div>
           <button type="button" class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
+            <img class="btn__icon" src="./asset/arrow-left-white.svg" alt="">
             <span class="btn__title">กลับไปค้นหา</span>
           </button>
         </div>
@@ -421,8 +422,27 @@
 
     <!-- MAP -->
     <div id="map-wrapper">
-      <div id="simplemap"></div>
+
       <div id="map"></div>
+
+      <div class="map__legend">
+        <div class="map__legend-item">
+          <div class="map__legend-icon map__legend-icon--visible"></div>
+          <div class="map__legend-label">จังหวัดที่มีการเปิดเผยข้อมูลสถานบริการ</div>
+        </div>
+        <div class="map__legend-item">
+          <div class="map__legend-icon map__legend-icon--hidden"></div>
+          <div class="map__legend-label">จังหวัดที่มีสถานบริการ แต่ไม่เปิดเผยข้อมูล</div>
+        </div>
+      </div>
+
+      <div class="map__back-button">
+        <div class="btn btn--primary" id="map-back-button">
+          <img class="btn__icon" src="./asset/chevron-left-white.svg" alt="">
+          <div class="btn__title">กลับไปที่แผนที่</div>
+        </div>
+      </div>
+
     </div>   
   </section>
  

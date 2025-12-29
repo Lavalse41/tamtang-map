@@ -19,6 +19,9 @@
   --active-color:#C1FF6B;
   --inactive-color:#eaeaea;
 
+  --visible-color: #318772;
+  --hidden-color: #95BC7A;
+
   --font-color: #202020;
   --font-body: 'Anuphan', sans-serif;
   --font-heading: 'Maitree', sans-serif;
@@ -277,6 +280,11 @@ a {
   box-shadow: none;
   display: flex;
 }
+/* .btn:first-child:hover, .btn:first-child:focus, .btn:first-child:active {
+  background-color: currentColor;
+  border: none;
+  outline: none;
+} */
 /* Primary Button */
 .btn.btn--primary,
 .btn.btn--primary-outline {
@@ -608,39 +616,6 @@ a {
   border-bottom: none;
 }
 
-
-    
-
-#map-wrapper {
-  position: relative;
-  width: 65%;
-  height: 100vh;
-  margin-left: 35%;
-}
-#simplemap {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} 
-#map {
-  position: absolute !important;
-  z-index: 1;
-  height: 100%;
-  width: 100%;
-}  
-#map-bg img {
-  position: absolute;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hide {
-  display:none;
-}
-
 @media screen and (max-width: 1200px) {
   .offcanvas-header {
     gap: 8px;
@@ -672,6 +647,169 @@ a {
   #map-wrapper {
     width: 100%;
     margin-left: 0;
+  }
+}
+
+/* =========================
+   Province Marker BG by class
+   - visible: green dark
+   - hidden:  green light
+========================= */
+/* Province Marker */
+.province-marker{
+  position: relative;
+  cursor: pointer;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  animation: province-pulse 2.2s infinite;
+
+  /* default = เขียวเข้ม */
+  background-color: var(--visible-color);
+}
+
+/* ไม่เปิดเผยข้อมูล = เขียวอ่อน */
+.province-marker--hidden{
+  background-color: var(--hidden-color);
+}
+
+/* เปิดเผยข้อมูล = เขียวเข้ม (เผื่ออยากกำหนด explicit) */
+.province-marker--visible{
+  background-color: var(--visible-color);
+}
+
+/* selected ให้ใหญ่ขึ้น */
+.province-marker.is-selected{
+  display: none;
+}
+
+/* icon */
+.province-marker__icon{
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.province-marker.is-selected .province-marker__icon{
+  width: 26px;
+  height: 26px;
+}
+/* hover label */
+.province-marker__label{
+  position: absolute;
+  left: 50%;
+  top: -34px;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.95);
+  color: var(--font-color);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease;
+}
+.province-marker:hover .province-marker__label{
+  opacity: 1;
+}
+
+/* Map */
+#map-wrapper {
+  position: relative;
+  width: 65%;
+  height: 100vh;
+  margin-left: 35%;
+}
+#simplemap {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} 
+#map {
+  position: absolute !important;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+}  
+#map-bg img {
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+.map__legend {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  padding: 1.25rem;
+  border-radius: var(--border-radius-m);
+  background-color: #fffffff0;
+  box-shadow: rgba(0, 0, 0, 0.1) 0.5rem 0.5rem 8px;
+  font-size: var(--font-small-size);
+  color: var(--font-color);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateX(-50%) scale(1);
+  transition: 0.8s all ease-in-out;
+}
+.map__legend-item {
+  display: flex;
+  align-items: center;
+}
+.map__legend-icon {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin-right: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--font-color);
+  display: inline-block;
+}
+.map__legend-icon.map__legend-icon--visible {
+  background-color: var(--visible-color);
+}
+.map__legend-icon.map__legend-icon--hidden {
+  background-color: var(--hidden-color);
+}
+.map__back-button {
+  position: absolute;
+  bottom: -100%;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%) scale(1);
+  transition: 0.8s all ease-in-out;
+}
+#map-wrapper:has(.province-marker.is-selected) .map__legend {
+  bottom: -100%;
+  transform: translateX(-50%) scale(0);
+}
+#map-wrapper:has(.province-marker.is-selected) .map__back-button {
+  bottom: 40px;
+  transform: translateX(-50%) scale(1);
+}
+
+@keyframes province-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(49, 135, 114, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(49, 135, 114, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(49, 135, 114, 0);
   }
 }
 /* universal */
