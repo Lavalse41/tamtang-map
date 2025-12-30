@@ -928,10 +928,8 @@ function buildOtherServiceSection(serviceRows) {
 // ===============================
 // Detail offcanvas (place card)
 // ===============================
-$(document).on('click', '.card.card--place #detail-link', async function (e) {
-  e.preventDefault();
-
-  const placeId = $(this).closest('.card.card--place').data('key');
+// ✅ ฟังก์ชันกลาง: เปิด offcanvasDetail + โหลดข้อมูลด้วย placeId
+async function openPlaceDetail(placeId) {
   if (!placeId) return;
 
   const mainEl = document.getElementById('offcanvasMain');
@@ -980,7 +978,7 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
     `);
 
     const contactHtml = buildPlaceContactHtml(data);
-    const noticeHtml = buildNoticeHtml(data);
+    const noticeHtml  = buildNoticeHtml(data);
     const serviceHtml = buildServiceSection(data, Array.isArray(services) ? services : []);
     const noteHtml = buildNoteSection(data);
     const highlightHtml = buildHighlightSection();
@@ -1000,6 +998,13 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
     $header.html(`<h2 class="offcanvas__title-th">เกิดข้อผิดพลาดในการโหลดข้อมูล</h2>`);
     $result.html(`<p>ลองใหม่อีกครั้ง</p>`);
   }
+}
+
+$(document).on('click', '.card.card--place #detail-link', async function (e) {
+  e.preventDefault();
+
+  const placeId = $(this).closest('.card.card--place').data('key');
+  await openPlaceDetail(placeId);
 });
 
 // ===============================
@@ -1084,6 +1089,7 @@ document.getElementById('map-back-button')?.addEventListener('click', async (e) 
 // Expose
 // ===============================
 window.handleSearch = handleSearch;
+window.openPlaceDetail = openPlaceDetail;
 
 // ===============================
 // Boot: overview map

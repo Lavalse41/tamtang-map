@@ -158,11 +158,22 @@ export async function initProvinceMap(places, centerRow) {
     const lng = Number(p.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
+    const placeId = p.place_id; // ✅ ใช้ key ที่คุณมีใน data
+
     const marker = new AdvancedMarkerElement({
       map,
       position: { lat, lng },
       title: p.name_th || '',
     });
+
+    // ✅ คลิกพินย่อย -> เปิด offcanvasDetail ของที่นั้น
+    if (placeId) {
+      marker.addListener('click', () => {
+        if (typeof window.openPlaceDetail === 'function') {
+          window.openPlaceDetail(placeId);
+        }
+      });
+    }
 
     placeMarkers.push(marker);
   });
