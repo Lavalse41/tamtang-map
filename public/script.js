@@ -319,8 +319,16 @@ export async function handleSearch(province) {
     const centerPosition = (centerPosRaw && centerPosRaw.lat && centerPosRaw.lng)
       ? { lat: Number(centerPosRaw.lat), lng: Number(centerPosRaw.lng) }
       : null;
-
-    initProvinceMap(provinceData, centerAndStatusData);
+    
+    if (!provinceInDb) {
+      // When a searched province is not found, show the overview map with all province centers.
+      await initOverviewMap(overviewCentersCache, (provinceName) => {
+        $('#search').val(provinceName);
+        handleSearch(provinceName);
+      });
+    } else {
+      initProvinceMap(provinceData, centerAndStatusData);
+    }
 
     // ถ้าไม่มีสถานที่ + ฟิลเตอร์แคบ → เพิ่มข้อความ “ไม่พบจากเงื่อนไข” (แต่ map ยังอยู่)
     if (!safeProvinceData.length) {
