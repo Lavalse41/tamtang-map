@@ -170,10 +170,7 @@ export async function handleSearch(province) {
   if (!searchedProvince || searchedProvince.trim() === '') {
     const newStatusCard = `
       <div class="block__item block__item-unavailable">
-        <div class="block__title">ไม่พบสถานบริการ<span class="d-inline-block">ที่คุณต้องการ</span></div>
-        <div class="block__detail">
-          <p class="text-center">กรุณากรอกจังหวัดเพื่อค้นหาสถานบริการ</p>
-        </div>
+        <div class="block__title"><span class="d-inline-block">กรุณากรอกจังหวัดเพื่อค้นหาสถานบริการ</span></div>
       </div>
     `;
     statusCardWrapper.html(newStatusCard);
