@@ -52,9 +52,31 @@ async function makeProvinceList() {
   }
 }
 
+// fetch thai province api
+async function makeProvinceSelectList() {
+  try {
+    const response = await fetch('https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/province.json');
+    const data = await response.json();
+    console.log("data:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching province data:", error);
+    throw error;
+  }
+};
+
+//populate province option
+const provinceSelectList = await makeProvinceSelectList();
+if (provinceSelectList) {
+  const sortedProvinces = provinceSelectList.map(item => item.name_th).sort((a, b) => a.localeCompare(b, 'th'));
+  
+  sortedProvinces.forEach(province => {
+    searchInput.append(`<option value="${province}">${province}</option>`);
+  });
+};
+
 // function to fetch province list
 const provinceList = await makeProvinceList();
-
 async function getProvinceCenterStatus(province) {
   try {
     const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/center`);
@@ -120,7 +142,7 @@ async function getData(province, week, type, foreignerMed, cost_type) {
   console.log("url:", url.toString());
   const response = await fetch(url);
   return await response.json();
-}
+} 
 
 async function getService(place_id) {
   try {
@@ -139,16 +161,6 @@ async function getService(place_id) {
 // ===============================
 // Autocomplete
 // ===============================
-$("#search").autocomplete({
-  source: provinceList,
-  minLength: 1,
-  select: function (event, ui) {
-    searchInput.val(ui.item.value);
-    searchBtn.click();
-    return false;
-  }
-});
-
 // ===============================
 // Search handler
 // ===============================
@@ -212,11 +224,14 @@ export async function handleSearch(province) {
     } catch (e) {
       provinceInDb = false;
       centerAndStatusData = [];
+
     }
 
     if (!Array.isArray(centerAndStatusData) || centerAndStatusData.length === 0) {
       provinceInDb = false;
       centerAndStatusData = [];
+      console.log("check province db", provinceInDb)
+
     }
 
     console.log("centerAndStatusData:", centerAndStatusData);
