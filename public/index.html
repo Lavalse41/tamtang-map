@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Tamtang Map</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" type="text/css" href="./style.css" />
@@ -121,7 +122,7 @@
               </form>
           </div>
           <button type="button" class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
-            <img class="btn__icon" src="./asset/arrow-left-white.svg" alt="">
+            <img class="btn__icon" src="./asset/chevron-left-white.svg" alt="">
             <span class="btn__title">กลับไปค้นหา</span>
           </button>
         </div>
@@ -141,7 +142,7 @@
 
       <div class="offcanvas-header">
         <img class="offcanvas__logo" src="./asset/logo.jpg">
-        <h1 class="offcanvas__title">แผนที่สถานบริการยุติ<span class="d-inline-block">การตั้งครรภ์</span><span class="d-inline-block">ในประเทศไทย</span> EDIT</h1>
+        <h1 class="offcanvas__title">แผนที่สถานบริการยุติ<span class="d-inline-block">การตั้งครรภ์</span><span class="d-inline-block">ในประเทศไทย</span></h1>
       </div>
 
       <div class="offcanvas-body">
@@ -158,7 +159,7 @@
                 <div class="col-xl-6 order-lg-3">
                   <div class="form-group">
                     <div class="form-label">
-                      อายุครรภ์ (สัปดาห์)
+                      อายุครรภ์ของตัวเอง (สัปดาห์)
                       <button type="button" class="btn btn--preg" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-content="ไม่รู้อายุครรภ์ใช่มั้ย ? <a href='#' data-bs-toggle='modal' data-bs-target='#pregCalModal'>กดคำนวณตรงนี้</a>">?</button>
                     </div>
                     <div class="form-select__container">
@@ -172,7 +173,7 @@
                 </div>
                 <div class="col-xl-6 order-lg-4">
                   <div class="form-group">
-                    <div class="form-label">ประเภท</div>
+                    <div class="form-label">ประเภทสถานบริการ</div>
                     <div class="form-select__container">
                       <select class="form-select" name="type" id="type-filter" placeholder="ประเภท">
                         <option value="gov">รัฐ</option>
@@ -228,7 +229,7 @@
              <div class="block__item block__item-hidden">
               <div class="block__title">ราชบุรี มีสถานบริการรัฐที่ไม่เปิดเผย</div>
               <div class="block__detail">
-                <p class="text-center"><a href="#0" target="_blank">ติดต่อทำทาง</a><span class="d-inline-block">เพื่อขอรับยา</span><span class="d-inline-block">ทางไปรษณีย์</span> <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้นะ</span></p>
+                <p class="text-center"><a href="#0" target="_blank">ติดต่อทำทาง</a><span class="d-inline-block">เพื่อขอรับยา</span><span class="d-inline-block">ทางไปรษณีย์</span> <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้ค่ะ</span></p>
               </div>
              </div>
              <div class="block__item block__item-unavailable">

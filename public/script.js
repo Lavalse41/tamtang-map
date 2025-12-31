@@ -8,7 +8,10 @@ $('#simplemap').hide();
 $('#map').show();
 
 //** Please change to Production name later **//
-const API_BASE_URL = 'http://localhost:10008';
+// const API_BASE_URL = 'http://localhost:10008';
+const API_BASE_URL = 'https://www.aomsuk.com/';
+// const API_BASE_URL = 'http://tamtangtest.local/';
+
 
 // ===============================
 // DOM refs
@@ -251,7 +254,7 @@ export async function handleSearch(province) {
     } else if (normalizedStatus === 'has_gov_hidden') {
       detailHtml = `
         <p class="text-center">
-          ติดต่อทำทางเพื่อขอรับยาทางไปรษณีย์
+          สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a>เพื่อขอรับยาทางไปรษณีย์
           <span class="d-inline-block">หรือสอบถามทางเลือกเพิ่มเติม</span>
         </p>
       `;
@@ -262,7 +265,7 @@ export async function handleSearch(province) {
           <span class="d-inline-block">สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a></span>
           <span class="d-inline-block">เพื่อขอรับยา</span>
           <span class="d-inline-block">ทางไปรษณีย์</span>
-          <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้นะ</span>
+          <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้ค่ะ</span>
         </p>
       `;
     }
@@ -352,7 +355,7 @@ export async function handleSearch(province) {
               <div class="card__body">
                 <div class="card__title">${nameThai}</div>
                 <div class="card__tag-group">
-                  <div class="card__tag">ไม่เกิน ${pregWeek} สัปดาห์</div>
+                  <div class="card__tag"> รับไม่เกิน ${pregWeek} สัปดาห์</div>
                   ${foreignerTagHtml}
                   ${costTypeTagHtml}
                 </div>
@@ -479,7 +482,7 @@ function buildPlaceContactHtml(data) {
     openLine1 = `เปิดทำการ ${openDay}${(openFrom && openTo) ? ` เวลา ${openFrom} - ${openTo} น.` : ''}`;
   }
 
-  let openLine2 = closedDay ? `${closedDay}` : '';
+  let openLine2 = closedDay ? `ยกเว้น ${closedDay}` : '';
 
   const tel = esc(data?.tel || '');
   const line = esc(data?.line || '');
@@ -557,7 +560,7 @@ function buildNoticeHtml(data) {
     normalItems.push(`
       <div class="media__item media__item-accept">
         <img class="media__icon" src="./asset/circle-check.svg" alt="">
-        <div class="media__title">${esc(referInCap)}</div>
+        <div class="media__title">รับส่งต่อ ${esc(referInCap)}</div>
       </div>
     `);
   }
@@ -917,7 +920,7 @@ function buildOtherServiceSection(serviceRows) {
   return `
     <div class="offcanvas__other-service">
       <div class="offcanvas__subtitle">บริการอื่นๆ</div>
-      <p class="mb-2">(กรุณาสอบถามราคาจากคลินิก)</p>
+      <p class="mb-2"></p>
       <ul>
         ${lis}
       </ul>

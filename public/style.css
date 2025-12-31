@@ -10,12 +10,12 @@
   --gray-dark: #4a4a4a;
   --gray-form: #7A7A7A;  
   --blue-dark: #0E184D;
-  --green-light: #D7FFA1;
-  --green-light-2: #F2FFD9;
+  --green-light: #dbfdae;
+  --green-light-2: #eaf8d8;
   --yellow-regular: #F1D758;
-  --yellow-light: #FFF1AB;
+  --yellow-light: #fcf5ca;
   --blue-light: #C0EDFF;
-
+s
   --active-color:#C1FF6B;
   --inactive-color:#eaeaea;
 
@@ -505,7 +505,7 @@ a {
   font-size: var(--font-small-size);
   border-radius: var(--border-radius-s);
   padding: 4px 12px;
-  background-color: var(--blue-light);
+  background-color: var(--green-light);
   display: flex;
   align-items: center;
   gap: 8px;
