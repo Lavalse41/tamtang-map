@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tamtang Map</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" type="text/css" href="./style.css" />
@@ -21,9 +22,12 @@
 </head>
 
 <body>  
-
+  <nav class="navbar navbar--mobile">
+    <div class="navbar__logo"><img src="./asset/logo.jpg"></div>
+    <h1 class="navbar__title">แผนที่สถานบริการยุติ<span class="d-inline-block">การตั้งครรภ์</span><span class="d-inline-block">ในประเทศไทย</span></h1>
+  </nav>
   <!-- Start Welcome Modal -->
-  <!-- <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -39,7 +43,7 @@
         <div class="modal-footer">
           <button class="btn btn--icon" data-bs-target="#notiModal2" data-bs-toggle="modal">
             <span class="btn__title">ถัดไป</span>
-            <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+            <img class="btn__icon" src="/asset/chevron-right.svg" alt="">
           </button>
         </div>
       </div>
@@ -58,7 +62,7 @@
         <div class="modal-footer">
           <button class="btn btn--icon" data-bs-target="#notiModal3" data-bs-toggle="modal">
             <span class="btn__title">ถัดไป</span>
-            <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+            <img class="btn__icon" src="/asset/chevron-right.svg" alt="">
           </button>
         </div>
       </div>
@@ -82,7 +86,7 @@
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
   <!-- End Welcome Modal -->
 
 
@@ -138,7 +142,10 @@
     <div class="offcanvas offcanvas--content offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasMain" aria-labelledby="offcanvasMainLabel">
       
       <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> -->
-       <div class="btn btn--offcanvas" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMain" aria-controls="offcanvasMain">Filter</div>
+       <div class="btn btn--offcanvas" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMain" aria-controls="offcanvasMain">
+        เริ่มการค้นหา
+        <img class="" src="./asset/search-white.svg">
+       </div>
 
       <div class="offcanvas-header">
         <img class="offcanvas__logo" src="/asset/logo.jpg">
@@ -451,6 +458,17 @@
 
     </div>   
   </section>
+
+  <div class="contact">
+    <a class="contact__item" href="#0" target="_blank">
+      <img class="contact__icon" src="./asset/line-white.svg" alt="">
+      <div class="contact__title">ปรึกษาทำทาง</div>
+    </a>
+    <a class="contact__item" href="#0" target="_blank">
+      <img class="contact__icon" src="./asset/medical-white.svg" alt="">
+      <div class="contact__title">รับยาทางไปรษณีย์</div>
+    </a>
+  </div>
  
 <!-- MAP SCRIPT -->
 <script>
@@ -482,13 +500,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js" integrity="sha512-TPh2Oxlg1zp+kz3nFA0C5vVC6leG/6mm1z9+mA81MI5eaUVqasPLO8Cuk4gMF4gUfP5etR73rgU/8PNMsSesoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js" integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
-  window.addEventListener('load', () => {
-    if (document.getElementById('notiModal')) {
-      const notiModal = new bootstrap.Modal(document.getElementById('notiModal'));
-      notiModal.show();
-    }
-  });
-</script>
 </body>
 </html>

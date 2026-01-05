@@ -7,9 +7,56 @@ import { initOverviewMap, initProvinceMap } from "./map.js";
 $('#simplemap').hide();
 $('#map').show();
 
+// ===============================
+// Welcome Modal
+// ===============================
+window.addEventListener('load', () => {
+    if (document.getElementById('notiModal')) {
+      const notiModal = new bootstrap.Modal(document.getElementById('notiModal'));
+      
+
+      function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+          let date = new Date();
+          date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+          expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + ";path=/;SameSite=Strict;";
+      }
+            
+      function getCookie(name) {
+        let nameEQ = name + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+      }
+
+      function completeModal() {
+        notiModal.show();
+        setCookie('modalLastPlayed', new Date().getTime(), 1);
+      }
+
+      // อ่านค่า modalLastPlayed จากคุกกี้
+      const modalLastPlayed = getCookie('modalLastPlayed');
+      const now = new Date().getTime();
+      const oneDay = 24 * 60 * 60 * 1000; // 24 ชั่วโมง
+    
+      if (!modalLastPlayed || (now - parseInt(modalLastPlayed)) > oneDay) {
+        completeModal();
+      } else {
+        notiModal.hide();
+      }
+    }
+  });
+
 //** Please change to Production name later **//
-// const API_BASE_URL = 'http://localhost:10008';
-const API_BASE_URL = 'https://www.aomsuk.com/';
+const API_BASE_URL = 'http://localhost:10008';
+// const API_BASE_URL = 'https://www.aomsuk.com/';
 // const API_BASE_URL = 'http://tamtangtest.local/';
 
 
@@ -433,6 +480,7 @@ document.querySelectorAll('.popover-dismiss').forEach(popoverNode => {
   new bootstrap.Popover(popoverNode, { trigger: 'focus' });
 });
 
+
 // ===============================
 // Preg Calculator
 // ===============================
@@ -580,7 +628,7 @@ function buildNoticeHtml(data) {
     normalItems.push(`
       <div class="media__item media__item-accept">
         <img class="media__icon" src="./asset/circle-check.svg" alt="">
-        <div class="media__title">รับส่งต่อ ${esc(referInCap)}</div>
+        <div class="media__title">รับส่งต่อ${esc(referInCap)}</div>
       </div>
     `);
   }
@@ -1144,3 +1192,26 @@ window.openPlaceDetail = openPlaceDetail;
     console.error('bootOverviewMap error:', err);
   }
 })();
+
+function bindResponsiveOffcanvasContent() {
+  const el = document.querySelector('.offcanvas--content');
+  if (!el) return;
+
+  // ใช้ Offcanvas instance เดิม (หรือสร้างครั้งเดียวถ้ายังไม่มี)
+  const inst = bootstrap.Offcanvas.getInstance(el) || bootstrap.Offcanvas.getOrCreateInstance(el);
+
+  const apply = () => {
+    if (window.innerWidth < 768) {
+      inst.hide(); // ซ่อนทันทีเมื่อจอเล็ก
+    } else {
+      inst.show(); // แสดงทันทีเมื่อจอใหญ่
+    }
+  };
+
+  window.addEventListener('load', apply);
+  window.addEventListener('resize', apply);
+
+  apply();
+}
+
+bindResponsiveOffcanvasContent();
