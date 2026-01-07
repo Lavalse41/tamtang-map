@@ -240,11 +240,20 @@ export async function handleSearch(province) {
   searchedProvince = searchedProvince.trim();
 
   // --- week filter (lt12/gt12/gt20) ---
-  const weekValueRaw = weekSelectbox.val();
-  let weekValue = null;
-  if (weekValueRaw === '9') weekValue = 'lt12';
-  else if (weekValueRaw === '12') weekValue = 'gt12';
-  else if (weekValueRaw === '20') weekValue = 'gt20';
+const weekValueRaw = weekSelectbox.val();
+let weekValue = null;
+
+// ✅ เพิ่ม all = แสดงทั้งหมด (ไม่ส่ง week ไปที่ API)
+if (weekValueRaw === 'all') {
+  weekValue = null;
+} else if (weekValueRaw === '9') {
+  weekValue = 'lt12';
+} else if (weekValueRaw === '12') {
+  weekValue = 'gt12';
+} else if (weekValueRaw === '20') {
+  weekValue = 'gt20';
+}
+
 
   // --- price filter ---
   const priceValueRaw = priceSelectbox.val();
@@ -383,16 +392,16 @@ export async function handleSearch(province) {
         (typeValueRaw !== 'all') ||
         (priceValueRaw !== 'all') ||
         (foreignerMed === 'y') ||
-        (weekValueRaw !== '9'); // 9 = default "ต่ำกว่า 12"
+        (weekValueRaw !== 'all'); // 9 = default "ต่ำกว่า 12"
 
       const hasSomeServiceInProvince = provinceInDb && (normalizedStatus !== 'not_have');
 
       if (hasSomeServiceInProvince && hasNarrowFilterOn) {
-        newStatusCard += `
+        newStatusCard = `
           <div class="block__item block__item-unavailable">
             <div class="block__title">ไม่พบสถานบริการจากเงื่อนไขที่เลือก</div>
             <div class="block__detail">
-              <p class="text-center">ลองนำฟิลเตอร์บางอันออก แล้วค้นหาใหม่อีกครั้ง</p>
+              <p class="text-center"><a href="#0" target="_blank">ปรึกษาทำทาง</a>เพื่อหาทางเลือกเพิ่มเติม<br>หรือนำฟิลเตอร์บางอันออก แล้วค้นหาใหม่อีกครั้ง</p>
             </div>
           </div>
         `;
