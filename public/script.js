@@ -55,8 +55,8 @@ window.addEventListener('load', () => {
   });
 
 //** Please change to Production name later **//
-const API_BASE_URL = 'http://localhost:10008';
-// const API_BASE_URL = 'https://www.aomsuk.com/';
+// const API_BASE_URL = 'http://localhost:10008';
+const API_BASE_URL = 'https://www.aomsuk.com/';
 // const API_BASE_URL = 'http://tamtangtest.local/';
 
 

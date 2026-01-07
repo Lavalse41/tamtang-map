@@ -104,6 +104,7 @@ a {
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  justify-content: center;
 }
 .offcanvas.offcanvas--content .offcanvas__title {
   margin-bottom: 0;
@@ -366,6 +367,7 @@ a {
 .btn.btn--icon .btn__icon {
   padding-bottom: 0.25rem;
   transition: 0.4s all ease-in-out;
+  max-width: 20px;
 }
 .btn.btn--icon:hover .btn__title::before {
   width: 100%;
