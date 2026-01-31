@@ -99,6 +99,19 @@ async function makeProvinceList() {
   }
 }
 
+
+//fetch telemed service 
+async function getTelemedService() {  
+  try {
+    const response = await fetch(`${API_BASE_URL}/wp-json/custom/v1/telemed`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching telemed service:", error);
+    throw error;
+  }
+}
+
 // fetch thai province api
 async function makeProvinceSelectList() {
   try {
@@ -112,6 +125,7 @@ async function makeProvinceSelectList() {
   }
 };
 
+
 //populate province option
 const provinceSelectList = await makeProvinceSelectList();
 if (provinceSelectList) {
@@ -121,6 +135,10 @@ if (provinceSelectList) {
     searchInput.append(`<option value="${province}">${province}</option>`);
   });
 };
+
+// test telemed service fetch
+const telemedList = await getTelemedService();
+console.log("telemedList:", telemedList);
 
 // function to fetch province list
 const provinceList = await makeProvinceList();
@@ -1085,6 +1103,15 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
 
   const placeId = $(this).closest('.card.card--place').data('key');
   await openPlaceDetail(placeId);
+});
+
+// ===============================
+// Contact Modal
+// ===============================
+$(document).on('click', '.contact__item', function(e) {
+  e.preventDefault();
+  const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
+  contactModal.show();
 });
 
 // ===============================

@@ -87,8 +87,10 @@
       </div>
     </div>
   </div>
-  <!-- End Welcome Modal -->
 
+  <!-- End Welcome Modal -->
+  
+  
 
 
   <!-- Start Preg Calculator Modal -->
@@ -135,6 +137,40 @@
   </div>
   <!-- End Preg Calculator Modal -->
   
+  <!-- Start Telemed Modal -->
+  <div class="modal fade" id="contactModal" aria-hidden="true" aria-labelledby="contactModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="contactModalLabel">กรุณากรอกข้อมูล</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="form">
+            <div class="form-group">
+              <div class="form-label">อายุครรภ์ (สัปดาห์)</div>
+              <input type="number" class="form-input" id="preg-week-telemed" placeholder="โปรดระบุ">
+            </div>
+            <div class="form-group">
+              <div class="form-label">สัญชาติ</div>
+              <div class="form-select__container">
+                <select class="form-select" id="nationality-telemed">
+                  <option selected value="thai" >คนไทย</option>
+                  <option value="foreigner">คนต่างชาติ</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--primary" data-bs-dismiss="modal">
+            <span class="btn__title">ปิด</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Telemed Modal -->
 
 
   <section class="section">
