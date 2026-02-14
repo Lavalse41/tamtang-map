@@ -99,11 +99,13 @@ async function makeProvinceList() {
   }
 }
 
-
-//fetch telemed service 
+//fetch telemed service api
 async function getTelemedService() {  
   try {
-    const response = await fetch(`${API_BASE_URL}/wp-json/custom/v1/telemed`);
+    const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/telemed`);
+    
+    console.log("url:", url.toString());
+    const response = await fetch(url);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -125,6 +127,45 @@ async function makeProvinceSelectList() {
   }
 };
 
+// ===============================
+// Telemed Service
+// ===============================
+
+// test telemed service fetch
+// const telemedList = await getTelemedService();
+// console.log("telemedList:", telemedList);
+
+// Telemed Modal Handler
+$("#telemed-submit-btn").on("click", async function() {
+  const pregWeek = $("#preg-week-telemed").val();
+  const type = $("#nationality-telemed").val();
+
+  console.log("Submitting Telemed Data:", { type, pregWeek });
+
+  const result = await getTelemedService(type, pregWeek);
+  console.log("Telemed Service Result:", result);
+});
+
+// Telemed Plus/Minus Handler
+$(document).on('click', '#btn-minus-preg', function() {
+  let val = parseInt($('#preg-week-telemed').val()) || 0;
+  if (val > 0) $('#preg-week-telemed').val(val - 1);
+});
+
+$(document).on('click', '#btn-plus-preg', function() {
+  let val = parseInt($('#preg-week-telemed').val()) || 0;
+  if (val < 24) $('#preg-week-telemed').val(val + 1);
+});
+
+$(document).on('input', '#preg-week-telemed', function() {
+  let val = $(this).val();
+  val = val.replace(/[^0-9]/g, '');
+  if (val !== '') {
+    if (parseInt(val) > 24) val = '24';
+    else val = parseInt(val).toString();
+  }
+  $(this).val(val);
+});
 
 //populate province option
 const provinceSelectList = await makeProvinceSelectList();
@@ -136,9 +177,6 @@ if (provinceSelectList) {
   });
 };
 
-// test telemed service fetch
-const telemedList = await getTelemedService();
-console.log("telemedList:", telemedList);
 
 // function to fetch province list
 const provinceList = await makeProvinceList();
@@ -315,10 +353,10 @@ if (weekValueRaw === 'all') {
     const provinceStatus = String(provinceStatusRaw).trim(); // กัน whitespace
 
     const provinceStatusTextMap = {
-      has_gov_and_private: 'มีทั้งสถานบริการรัฐและเอกชน',
-      has_private: 'มีเฉพาะสถานบริการเอกชน',
+      has_gov_and_private: 'มีทั้งสถานบริการของรัฐและเอกชน',
+      has_private: 'มีเฉพาะสถานบริการของเอกชน',
       has_gov: 'มีเฉพาะสถานบริการของรัฐ',
-      has_gov_hidden: 'มีสถานบริการของรัฐที่ไม่เปิดเผยข้อมูล',
+      has_gov_hidden: 'มีสถานบริการของรัฐที่ไม่เปิดเผยข้อมูลกับสาธารณะ',
       not_have: 'ยังไม่มีสถานบริการ'
     };
 
@@ -334,24 +372,22 @@ if (weekValueRaw === 'all') {
         <p class="text-center">ไม่เป็นไรนะ เรามีคำแนะนำให้</p>
         <ul>
           <li>ค้นหาในจังหวัดอื่นที่ใกล้เคียง</li>
-          <li><a href="#0" target="_blank">ปรึกษาทำทาง</a> เพื่อขอรับยาทางไปรษณีย์</li>
+          <li><a href="#0" target="_blank">ติดต่อคลินิกทานตะวัน</a> เพื่อขอรับยาทางไปรษณีย์</li>
         </ul>
       `;
     } else if (normalizedStatus === 'has_gov_hidden') {
       detailHtml = `
         <p class="text-center">
-          สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a>เพื่อขอรับยาทางไปรษณีย์
+          สามารถ<a href="#0" target="_blank">ติดต่อคลินิกทานตะวัน</a>เพื่อขอรับยาทางไปรษณีย์
           <span class="d-inline-block">หรือสอบถามทางเลือกเพิ่มเติม</span>
         </p>
       `;
     } else {
       detailHtml = `
         <p class="text-center">
-          หากไม่พบสถานบริการที่สนใจ
-          <span class="d-inline-block">สามารถ<a href="#0" target="_blank">ติดต่อทำทาง</a></span>
-          <span class="d-inline-block">เพื่อขอรับยา</span>
-          <span class="d-inline-block">ทางไปรษณีย์</span>
-          <span class="d-inline-block">หรือสอบถามเพิ่มเติมได้ค่ะ</span>
+          <span class="d-inline-block">นอกจากนี้ยังมีสถานบริการอื่นที่ไม่ได้เปิดเผยข้อมูลต่อสาธารณะ</span>
+          <span class="d-inline-block">หากต้องการข้อมูลเพิ่มเติม <a href="#0" target="_blank">ติดต่อทำทาง</a></span>
+
         </p>
       `;
     }
@@ -1103,15 +1139,6 @@ $(document).on('click', '.card.card--place #detail-link', async function (e) {
 
   const placeId = $(this).closest('.card.card--place').data('key');
   await openPlaceDetail(placeId);
-});
-
-// ===============================
-// Contact Modal
-// ===============================
-$(document).on('click', '.contact__item', function(e) {
-  e.preventDefault();
-  const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
-  contactModal.show();
 });
 
 // ===============================

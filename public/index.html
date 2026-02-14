@@ -90,9 +90,6 @@
 
   <!-- End Welcome Modal -->
   
-  
-
-
   <!-- Start Preg Calculator Modal -->
   <div class="modal modal--pregcal fade" id="pregCalModal" aria-hidden="true" aria-labelledby="pregCalModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
@@ -138,34 +135,17 @@
   <!-- End Preg Calculator Modal -->
   
   <!-- Start Telemed Modal -->
-  <div class="modal fade" id="contactModal" aria-hidden="true" aria-labelledby="contactModalLabel" tabindex="-1">
+  <div class="modal fade" id="telemedModal" aria-hidden="true" aria-labelledby="telemedModalLabel" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="contactModalLabel">กรุณากรอกข้อมูล</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form class="form">
-            <div class="form-group">
-              <div class="form-label">อายุครรภ์ (สัปดาห์)</div>
-              <input type="number" class="form-input" id="preg-week-telemed" placeholder="โปรดระบุ">
-            </div>
-            <div class="form-group">
-              <div class="form-label">สัญชาติ</div>
-              <div class="form-select__container">
-                <select class="form-select" id="nationality-telemed">
-                  <option selected value="thai" >คนไทย</option>
-                  <option value="foreigner">คนต่างชาติ</option>
-                </select>
-              </div>
-            </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn--primary" data-bs-dismiss="modal">
-            <span class="btn__title">ปิด</span>
-          </button>
         </div>
       </div>
     </div>
@@ -481,7 +461,7 @@
         </div>
         <div class="map__legend-item">
           <div class="map__legend-icon map__legend-icon--hidden"></div>
-          <div class="map__legend-label">จังหวัดที่มีสถานบริการ แต่ไม่เปิดเผยข้อมูล</div>
+          <div class="map__legend-label">จังหวัดที่มีสถานบริการ แต่ไม่เปิดเผยข้อมูลต่อสาธารณะ</div>
         </div>
       </div>
 
@@ -496,11 +476,11 @@
   </section>
 
   <div class="contact">
-    <a class="contact__item" href="#0" target="_blank">
+    <a class="contact__item" href="https://lin.ee/URXSvJO" target="_blank">
       <img class="contact__icon" src="./asset/line-white.svg" alt="">
       <div class="contact__title">ปรึกษาทำทาง</div>
     </a>
-    <a class="contact__item" href="#0" target="_blank">
+    <a class="contact__item" href="#" data-bs-toggle="modal" data-bs-target="#telemedModal">
       <img class="contact__icon" src="./asset/medical-white.svg" alt="">
       <div class="contact__title">รับยาทางไปรษณีย์</div>
     </a>
