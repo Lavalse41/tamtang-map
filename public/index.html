@@ -27,7 +27,7 @@
     <h1 class="navbar__title">แผนที่สถานบริการยุติ<span class="d-inline-block">การตั้งครรภ์</span><span class="d-inline-block">ในประเทศไทย</span></h1>
   </nav>
   <!-- Start Welcome Modal -->
-  <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1"data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade" id="notiModal" aria-hidden="true" aria-labelledby="notiModalLabel" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -41,44 +41,6 @@
           </ul>
         </div>
         <div class="modal-footer">
-          <button class="btn btn--icon" data-bs-target="#notiModal2" data-bs-toggle="modal">
-            <span class="btn__title">ถัดไป</span>
-            <img class="btn__icon" src="/asset/chevron-right.svg" alt="">
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal fade" id="notiModal2" aria-hidden="true" aria-labelledby="notiModalLabel2" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="notiModalLabel2">(ข้อความต้อนรับ)</h1>
-        </div>
-        <div class="modal-body">
-          <p>Modal 2</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn--icon" data-bs-target="#notiModal3" data-bs-toggle="modal">
-            <span class="btn__title">ถัดไป</span>
-            <img class="btn__icon" src="/asset/chevron-right.svg" alt="">
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="notiModal3" aria-hidden="true" aria-labelledby="notiModalLabel3" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="notiModalLabel3">(ข้อความต้อนรับ)</h1>
-        </div>
-        <div class="modal-body">
-          <p>Last slide</p>
-        </div>
-        <div class="modal-footer">
           <button class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
             <span class="btn__title">เริ่มค้นหา</span>
             <img class="btn__icon" src="./asset/search-white.svg" alt="">
@@ -87,7 +49,6 @@
       </div>
     </div>
   </div>
-
   <!-- End Welcome Modal -->
   
   <!-- Start Preg Calculator Modal -->
@@ -99,7 +60,7 @@
         </div>
         <div class="modal-body">
           <div class="outer-container">
-              <form class="form" action="">
+              <form class="form form--pregcal" action="">
                 <div class="container-fluid px-0">
                   <div class="row">
                     <div class="col-12">
@@ -133,24 +94,6 @@
     </div>
   </div>
   <!-- End Preg Calculator Modal -->
-  
-  <!-- Start Telemed Modal -->
-  <div class="modal fade" id="telemedModal" aria-hidden="true" aria-labelledby="telemedModalLabel" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form class="form">
-          </form>
-        </div>
-        <div class="modal-footer">
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- End Telemed Modal -->
 
 
   <section class="section">
@@ -452,6 +395,30 @@
     <!-- MAP -->
     <div id="map-wrapper">
 
+      <!-- Start Welcome Modal -->
+      <div class="modal fade" id="mapModal" aria-hidden="true" aria-labelledby="mapModalLabel" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title fs-5" id="mapModalLabel"><!--[จังหวัด]<br>ยังไม่มีสถานบริการที่เปิดเผยข้อมูล--></div>
+            </div>
+            <!-- <div class="modal-body">
+              <ul>
+                <li>ตอนนี้ทำแท้งถูกกฎหมายแล้ว</li>
+                <li>เราสามารถรับบริการได้ฟรี อย่างไร</li>
+                <li>หากค้นหาแล้ว ไม่พบสถานที่ที่ต้องการ สามารถติดต่อทำทางเพื่อขอข้อมูลสถานที่อื่นที่ไม่ได้อยู่บนแผนที่</li>
+              </ul>
+            </div> -->
+            <div class="modal-footer">
+              <button class="btn btn--primary" data-bs-dismiss="modal" aria-label="Close">
+                <span class="btn__title">ค้นหาจังหวัดอื่น</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Welcome Modal -->
+
       <div id="map"></div>
 
       <div class="map__legend">
@@ -485,6 +452,139 @@
       <div class="contact__title">รับยาทางไปรษณีย์</div>
     </a>
   </div>
+
+  <!-- Start Telemed Modal -->
+  <div class="modal modal--telemed fade" id="telemedModal" aria-hidden="true" aria-labelledby="telemedModalLabel" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <button type="button" class="modal__close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- <div class="modal-header">
+          
+        </div> -->
+        <div class="modal-body">
+          <div class="modal__warning">
+            <img class="modal__warning-icon" src="./asset/icon-warning.svg" alt="">
+            <div class="modal__warning-text">การรับยาทางไปรษณีย์เหมาะสำหรับอายุครรภ์ที่ต่ำกว่า 12 สัปดาห์เท่านั้น</div>
+            <div class="modal__warning-text">ถ้ายังไม่รู้อายุครรภ์ <a data-bs-toggle="collapse" href="#collapsePregcal" role="button" aria-expanded="false" aria-controls="collapsePregcal"><strong>กดคำนวณที่นี่</strong></a></div>
+            <div class="modal__warning-form collapse" id="collapsePregcal">
+              <p>เลือกวันแรกที่ประจำเดือนมาครั้งล่าสุด</p>
+              <form class="form form--pregcal" action="">
+                <div class="container-fluid px-0">
+                  <div class="row justify-content-center">
+                    <div class="col-auto">
+                      <div class="form-group">
+                        <input class="form-input" type="date" id="start" name="start" value="" min="" max="">
+                      </div>
+                    </div>
+                    <div class="col-12 d-none">
+                      <div class="form-group">
+                        <div class="form-label">วันสุดท้ายที่ประจำเดือนมา</div>
+                        <input class="form-input" type="date" id="end" name="end" value="" min="" max="">
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="result">
+                        <p>อายุครรภ์ปัจจุบันของคุณ คือ <span class="highlight d-inline-block" id="preg-res"></span></p>
+                        <p class="text-small mb-0">*หมายเหตุ: เป็นการคำนวณโดยประมาณ กรุณาตรวจอายุครรภ์ที่สถานรับบริการอีกครั้งเพื่อความถูกต้อง</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            
+            <div class="modal__warning-text">หากอายุครรภ์เกิน 12 สัปดาห์ เรามีคำแนะนำให้</div>
+            <div class="modal__warning-button-group">
+              <a class="btn btn--primary-warning" href="https://lin.ee/URXSvJO" target="_blank"><span class="btn__title">ปรึกษาทำทาง</span><img class="btn__icon" src="./asset/phone-white.svg" alt=""></a>
+              <a class="btn btn--primary-warning" data-bs-dismiss="modal" aria-label="Close"><span class="btn__title">ค้นหาสถานบริการอื่น</span><img class="btn__icon" src="./asset/location-white.svg" alt=""></a>
+            </div>
+          </div>
+
+          <div class="modal__notice">
+            <div class="modal__notice-title">สถานบริการที่สามารถส่งยาทางไปรษณีย์ได้มีดังนี้</div>
+            <ul>
+              <li>สถานบริการทุกแห่งมีหมอที่มีมาตรฐาน ส่งจากคลินิกที่จดทะเบียนถูกต้อง</li>
+              <li>มีการติดตาม สอบถามได้ตลอด</li>
+              <li>ยาถูกกฎหมาย ขึ้นทะเบียนกับกระทรวงสาธารณสุข</li>
+            </ul>
+          </div>
+
+          <div class="modal__detail">
+            <div class="table-responsive">
+              <table class="table table--telemed">
+                <thead>
+                  <tr>
+                    <th>ชื่อสถานพยาบาล</th>
+                    <th>จังหวัด</th>
+                    <th>ต้องใช้ผลอัลตราซาวด์</th>
+                    <th>ค่าใช้จ่าย</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- <tr>
+                    <td>คลินิคทานตะวัน <span class="table__recommend">แนะนำ</span></td>
+                    <td>กรุงเทพมหานคร</td>
+                    <td><img src="./asset/check-green.svg" alt=""></td>
+                    <td><p>1,500 บาท</p></td>
+                    <td>
+                      <button class="btn btn--icon" id="detail-link" data-key="1">
+                        <span class="btn__title">ดูรายละเอียด</span>
+                        <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>คลินิกเวชกรรมชุมชน ​PDA</td>
+                    <td>กรุงเทพมหานคร</td>
+                    <td><img src="./asset/wrong-red.svg" alt=""></td>
+                    <td>
+                      <p>อายุครรภ์ ​1-9 สัปดาห์ ราคา 3,000 บาท</p>
+                      <p>อายุครรภ์ ​10-12 สัปดาห์ ราคา 3,500 บาท</p>
+                    </td>
+                    <td>
+                      <button class="btn btn--icon" id="detail-link" data-key="8">
+                        <span class="btn__title">ดูรายละเอียด</span>
+                        <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>คลินิค C</td>
+                    <td>นนทบุรี</td>
+                    <td><img src="./asset/check-green.svg" alt=""></td>
+                    <td>
+                      <p>คนไทย</p>
+                      <ul>
+                        <li>อายุครรภ์ต่ำกว่า 6 เดือน 3,000 บาท</li>
+                        <li>อายุครรภ์มากกว่า 6 เดือน์ 3,500 บาท</li>
+                      </ul>
+                      <p>คนต่างชาติ</p>
+                      <ul>
+                        <li>อายุครรภ์ต่ำกว่า 6 เดือน 3,200 บาท</li>
+                        <li>อายุครรภ์มากกว่า 6 เดือน์ 3,700 บาท</li>
+                      </ul>
+                    </td>
+                    <td>
+                      <button class="btn btn--icon" id="detail-link" data-key="10">
+                        <span class="btn__title">ดูรายละเอียด</span>
+                        <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+                      </button>
+                    </td>
+                  </tr> -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <p class="text-center">มีข้อสงสัย? <a href="https://lin.ee/URXSvJO" target="_blank">สอบถามมูลนิธิทำทาง</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Telemed Modal -->
  
 <!-- MAP SCRIPT -->
 <script>

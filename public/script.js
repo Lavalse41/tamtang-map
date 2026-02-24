@@ -99,21 +99,6 @@ async function makeProvinceList() {
   }
 }
 
-//fetch telemed service api
-async function getTelemedService() {  
-  try {
-    const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/telemed`);
-    
-    console.log("url:", url.toString());
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching telemed service:", error);
-    throw error;
-  }
-}
-
 // fetch thai province api
 async function makeProvinceSelectList() {
   try {
@@ -127,6 +112,47 @@ async function makeProvinceSelectList() {
   }
 };
 
+// For Telemed Data
+let placeLookupMap = {};
+let telemedPlaceMap = {};
+
+async function buildPlaceLookup() {
+  try {
+    const allPlaces = await getData(null, null, null, null, null);
+    // getData ถ้าไม่ใส่ param จะได้ทั้งหมด (จาก script เดิมคุณ)
+
+    placeLookupMap = {};
+
+    (allPlaces || []).forEach(p => {
+      const key = `${p.name_th}__${p.province}`;
+      placeLookupMap[key] = p.place_id;
+    });
+
+    console.log('placeLookupMap built:', placeLookupMap);
+
+  } catch (err) {
+    console.error('buildPlaceLookup error:', err);
+  }
+}
+// For Telemed Tag
+async function buildTelemedLookup() {
+  try {
+    const telemedData = await getTelemedService();
+
+    telemedPlaceMap = {};
+
+    (telemedData || []).forEach(row => {
+      const key = `${row.name_th}__${row.province}`;
+      telemedPlaceMap[key] = true;
+    });
+
+    console.log('telemedPlaceMap built:', telemedPlaceMap);
+
+  } catch (err) {
+    console.error('buildTelemedLookup error:', err);
+  }
+}
+
 // ===============================
 // Telemed Service
 // ===============================
@@ -136,36 +162,36 @@ async function makeProvinceSelectList() {
 // console.log("telemedList:", telemedList);
 
 // Telemed Modal Handler
-$("#telemed-submit-btn").on("click", async function() {
-  const pregWeek = $("#preg-week-telemed").val();
-  const type = $("#nationality-telemed").val();
+// $("#telemed-submit-btn").on("click", async function() {
+//   const pregWeek = $("#preg-week-telemed").val();
+//   const type = $("#nationality-telemed").val();
 
-  console.log("Submitting Telemed Data:", { type, pregWeek });
+//   console.log("Submitting Telemed Data:", { type, pregWeek });
 
-  const result = await getTelemedService(type, pregWeek);
-  console.log("Telemed Service Result:", result);
-});
+//   const result = await getTelemedService(type, pregWeek);
+//   console.log("Telemed Service Result:", result);
+// });
 
-// Telemed Plus/Minus Handler
-$(document).on('click', '#btn-minus-preg', function() {
-  let val = parseInt($('#preg-week-telemed').val()) || 0;
-  if (val > 0) $('#preg-week-telemed').val(val - 1);
-});
+// // Telemed Plus/Minus Handler
+// $(document).on('click', '#btn-minus-preg', function() {
+//   let val = parseInt($('#preg-week-telemed').val()) || 0;
+//   if (val > 0) $('#preg-week-telemed').val(val - 1);
+// });
 
-$(document).on('click', '#btn-plus-preg', function() {
-  let val = parseInt($('#preg-week-telemed').val()) || 0;
-  if (val < 24) $('#preg-week-telemed').val(val + 1);
-});
+// $(document).on('click', '#btn-plus-preg', function() {
+//   let val = parseInt($('#preg-week-telemed').val()) || 0;
+//   if (val < 24) $('#preg-week-telemed').val(val + 1);
+// });
 
-$(document).on('input', '#preg-week-telemed', function() {
-  let val = $(this).val();
-  val = val.replace(/[^0-9]/g, '');
-  if (val !== '') {
-    if (parseInt(val) > 24) val = '24';
-    else val = parseInt(val).toString();
-  }
-  $(this).val(val);
-});
+// $(document).on('input', '#preg-week-telemed', function() {
+//   let val = $(this).val();
+//   val = val.replace(/[^0-9]/g, '');
+//   if (val !== '') {
+//     if (parseInt(val) > 24) val = '24';
+//     else val = parseInt(val).toString();
+//   }
+//   $(this).val(val);
+// });
 
 //populate province option
 const provinceSelectList = await makeProvinceSelectList();
@@ -280,12 +306,38 @@ export async function handleSearch(province) {
     if (province) province.preventDefault();
     searchedProvince = searchInput.val();
   }
-
+  
+  // --- week filter (ดึงมาก่อนเพื่อใช้เช็คเงื่อนไข) ---
+  const weekValueRaw = weekSelectbox.val();
   // ถ้าไม่กรอกจังหวัด
   if (!searchedProvince || searchedProvince.trim() === '') {
+    // ✅ กรณี > 20 สัปดาห์
+    if (weekValueRaw === '20') {
+      const newStatusCard = `
+        <div class="block__item block__item-unavailable">
+          <div class="block__title">
+            หากอายุครรภ์มากกว่า 20 สัปดาห์
+          </div>
+          <div class="block__detail">
+            
+          <p class="text-center">
+            <a href="https://lin.ee/URXSvJO" target="_blank">กรุณาติดต่อมูลนิธิทำทาง</a>
+          </p>
+      
+          </div>
+        </div>
+      `;
+      statusCardWrapper.html(newStatusCard);
+      placeCardWrapper.html("");
+      return;
+    }
+
+    // กรณีทั่วไป
     const newStatusCard = `
       <div class="block__item block__item-unavailable">
-        <div class="block__title"><span class="d-inline-block">กรุณากรอกจังหวัดเพื่อค้นหาสถานบริการ</span></div>
+        <div class="block__title">
+          <span class="d-inline-block">กรุณากรอกจังหวัดเพื่อค้นหาสถานบริการ</span>
+        </div>
       </div>
     `;
     statusCardWrapper.html(newStatusCard);
@@ -296,7 +348,7 @@ export async function handleSearch(province) {
   searchedProvince = searchedProvince.trim();
 
   // --- week filter (lt12/gt12/gt20) ---
-const weekValueRaw = weekSelectbox.val();
+// const weekValueRaw = weekSelectbox.val();
 let weekValue = null;
 
 // ✅ เพิ่ม all = แสดงทั้งหมด (ไม่ส่ง week ไปที่ API)
@@ -382,6 +434,15 @@ if (weekValueRaw === 'all') {
           <span class="d-inline-block">หรือสอบถามทางเลือกเพิ่มเติม</span>
         </p>
       `;
+
+        // ใส่ชื่อจังหวัดลง modal title
+        const modalTitle = document.getElementById('mapModalLabel');
+        if (modalTitle) {
+          modalTitle.innerHTML = `${provinceName}<br>ยังไม่มีสถานบริการที่เปิดเผยข้อมูล`;
+        }
+
+        const mapModal = new bootstrap.Modal(document.getElementById('mapModal'));
+        mapModal.show();
     } else {
       detailHtml = `
         <p class="text-center">
@@ -480,6 +541,11 @@ if (weekValueRaw === 'all') {
             ? `<div class="card__tag">มีบริการสำหรับต่างชาติ</div>`
             : '';
 
+          const telemedKey = `${safeProvinceData[key].name_th}__${safeProvinceData[key].province}`;
+          const telemedTagHtml = telemedPlaceMap[telemedKey]
+            ? `<div class="card__tag telemed">รับยาทางไปรษณีย์ได้</div>`
+            : '';
+
           newCard += `
             <div class="card card--place" data-key="${placeId}">
               <div class="card__body">
@@ -487,6 +553,7 @@ if (weekValueRaw === 'all') {
                 <div class="card__tag-group">
                   <div class="card__tag"> รับไม่เกิน ${pregWeek} สัปดาห์</div>
                   ${foreignerTagHtml}
+                  ${telemedTagHtml}
                   ${costTypeTagHtml}
                 </div>
               </div>
@@ -547,25 +614,32 @@ document.querySelectorAll('.popover-dismiss').forEach(popoverNode => {
 // ===============================
 // Preg Calculator
 // ===============================
-if ($('#pregCalModal').length) {
+if ($('.form.form--pregcal').length) {
+
   var today = new Date();
   var dd = today.getDate();
-  var mm = today.getMonth() + 1; //January is 0
+  var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
 
   if (dd < 10) { dd = '0' + dd; }
   if (mm < 10) { mm = '0' + mm; }
 
   today = yyyy + '-' + mm + '-' + dd;
-  $("#start").attr("max", today);
-  $("#end").attr("value", today);
 
-  function calculatePreg() {
-    const startVal = $("#start").val();
-    const endVal = $("#end").val();
+  // ✅ set max / default ให้ทุก form--pregcal
+  $('.form.form--pregcal').each(function () {
+    $(this).find('#start').attr('max', today);
+    $(this).find('#end').val(today);
+  });
+
+  function calculatePreg($form) {
+
+    const startVal = $form.find('#start').val();
+    const endVal = $form.find('#end').val();
+    const $result = $form.find('#preg-res');
 
     if (!startVal || !endVal) {
-      $("#preg-res").html("");
+      $result.html('');
       return;
     }
 
@@ -573,20 +647,30 @@ if ($('#pregCalModal').length) {
     const end = new Date(endVal);
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      $("#preg-res").html("");
+      $result.html('');
       return;
     }
 
-    const diffTime = Math.abs(end - start);
+    // 🔒 กัน end < start
+    if (end < start) {
+      $result.html('วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น');
+      return;
+    }
+
+    const diffTime = end - start;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const weeks = Math.floor(diffDays / 7);
     const days = diffDays % 7;
 
-    $("#preg-res").html(`${weeks} สัปดาห์ ${days} วัน`);
+    $result.html(`${weeks} สัปดาห์ ${days} วัน`);
   }
 
-  $("#start").on("change", calculatePreg);
-  $("#end").on("change", calculatePreg);
+  // ✅ bind change แบบ scoped ต่อ form
+  $(document).on('change', '#start, #end', function () {
+    const $form = $(this).closest('.form.form--pregcal');
+    calculatePreg($form);
+  });
+
 }
 
 // ===============================
@@ -753,6 +837,18 @@ function buildNoticeHtml(data) {
   }
 
   if (normalItems.length === 0 && warnItems.length === 0) return '';
+
+  // ===== telemed (รับยาทางไปรษณีย์) =====
+  if (String(data?.has_telemed ?? '').trim() === 'y') {
+    normalItems.push(`
+      <div class="media__item media__item-telemed">
+        <img class="media__icon" src="./asset/envelope-white.svg" alt="">
+        <div class="media__title">
+          สามารถรับยาทางพัสดุไปรษณีย์ได้ (ไม่ต้องเดินทาง)
+        </div>
+      </div>
+    `);
+  }
 
   return `
     <div class="media media--notice">
@@ -1059,6 +1155,195 @@ function buildOtherServiceSection(serviceRows) {
   `;
 }
 
+
+// TeleMed
+//fetch telemed service api
+async function getTelemedService() {  
+  try {
+    const url = new URL(`${API_BASE_URL}/wp-json/custom/v1/telemed`);
+    
+    console.log("url:", url.toString());
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching telemed service:", error);
+    throw error;
+  }
+}
+
+function buildTelemedTableRows(data) {
+  if (!Array.isArray(data) || data.length === 0) {
+    return `
+      <tr>
+        <td colspan="5">ไม่พบข้อมูล</td>
+      </tr>
+    `;
+  }
+
+  // ===== group ตามสถานพยาบาล =====
+  const grouped = {};
+
+  data.forEach(row => {
+    const key = `${row.name_th}__${row.province}`;
+
+    if (!grouped[key]) {
+      grouped[key] = {
+        name_th: row.name_th,
+        province: row.province,
+        must_ultrasound: row.must_ultrasound,
+        has_foreigner_price: row.has_foreigner_price,
+        services: []
+      };
+    }
+
+    grouped[key].services.push(row);
+  });
+
+  // helper: normalize type
+  const normalizeType = (t) => {
+    const s = String(t ?? '').toLowerCase().trim();
+    return (s === 'foreigner' || s === 'foreign') ? 'foreigner' : 'thai';
+  };
+
+  // helper: get unique costs by type (optionally ignore inactive)
+  const getCostsByType = (services, type, { ignoreInactive = true } = {}) => {
+    const set = new Set();
+
+    (services || [])
+      .filter(s => normalizeType(s.type) === type)
+      .forEach(s => {
+        const status = String(s.status ?? '').toLowerCase().trim();
+        if (ignoreInactive && status === 'inactive') return;
+
+        const cost = String(s.cost ?? '').trim();
+        if (cost) set.add(cost);
+      });
+
+    return Array.from(set);
+  };
+
+  // helper: build cost html
+  const buildCostHtml = (thaiCosts, foreignerCosts) => {
+    const hasThai = thaiCosts.length > 0;
+    const hasForeigner = foreignerCosts.length > 0;
+
+    // ไม่มีราคาเลย
+    if (!hasThai && !hasForeigner) return `<p>-</p>`;
+
+    // มีทั้งสองแบบ -> แยกหัวข้อให้ชัด
+    if (hasThai && hasForeigner) {
+      return `
+        <div class="cost-group">
+          <p class="mb-0">คนไทย</p>
+          <ul class="mb-2">
+            ${thaiCosts.map(c => `<li>${esc(c)}</li>`).join('')}
+          </ul>
+
+          <p class="mb-0">คนต่างชาติ</p>
+          <ul class="mb-0">
+            ${foreignerCosts.map(c => `<li>${esc(c)}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    // มีอย่างใดอย่างหนึ่ง
+    const costs = hasThai ? thaiCosts : foreignerCosts;
+    if (costs.length > 1) {
+      return `
+        <ul class="mb-0">
+          ${costs.map(c => `<li>${esc(c)}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    if (costs.length === 1) {
+      return `<p class="mb-0">${esc(costs[0])}</p>`;
+    }
+
+    return `<p>-</p>`;
+  };
+
+  return Object.values(grouped).map(place => {
+
+    const lookupKey = `${place.name_th}__${place.province}`;
+    const placeId = placeLookupMap[lookupKey] || '';
+
+    const name = esc(place.name_th || '-');
+    const province = esc(place.province || '-');
+
+    const mustUltrasound = String(place.must_ultrasound).trim() === 'y'
+      ? `<img src="./asset/check-green.svg" alt="">`
+      : `<img src="./asset/wrong-red.svg" alt="">`;
+
+    // ✅ ดึงหลายราคา/หลายบรรทัด ต่อ type
+    const thaiCosts = getCostsByType(place.services, 'thai', { ignoreInactive: true });
+    const foreignerCosts = getCostsByType(place.services, 'foreigner', { ignoreInactive: true });
+
+    // ✅ สร้าง HTML แสดงราคา (รองรับมีทั้งไทย+ต่างชาติ)
+    const costHtml = buildCostHtml(thaiCosts, foreignerCosts);
+
+    return `
+      <tr>
+        <td>${name}</td>
+        <td>${province}</td>
+        <td>${mustUltrasound}</td>
+        <td>${costHtml}</td>
+        <td>
+          <button class="btn btn--icon" id="detail-link" data-key="${placeId}">
+            <span class="btn__title">ดูข้อมูลติดต่อ</span>
+            <img class="btn__icon" src="./asset/chevron-right.svg" alt="">
+          </button>
+        </td>
+      </tr>
+    `;
+
+  }).join('');
+}
+
+$('#telemedModal').on('shown.bs.modal', async function () {
+  try {
+    const telemedData = await getTelemedService();
+    console.log('telemedData:', telemedData);
+
+    const rowsHtml = buildTelemedTableRows(telemedData);
+
+    $('.table--telemed tbody').html(rowsHtml);
+
+  } catch (err) {
+    console.error(err);
+    $('.table--telemed tbody').html(`
+      <tr>
+        <td colspan="5">เกิดข้อผิดพลาดในการโหลดข้อมูล</td>
+      </tr>
+    `);
+  }
+});
+
+$(document).on('click', '.table--telemed #detail-link', async function (e) {
+  e.preventDefault();
+
+  const placeId = $(this).data('key');
+  if (!placeId) return;
+
+  const modalEl = document.getElementById('telemedModal');
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+  if (modalInstance) {
+    // รอให้ modal ปิดก่อน แล้วค่อยเปิด detail
+    modalEl.addEventListener('hidden.bs.modal', async function handler() {
+      modalEl.removeEventListener('hidden.bs.modal', handler);
+      await openPlaceDetail(placeId);
+    });
+
+    modalInstance.hide();
+  } else {
+    // กรณีไม่มี instance (กันพลาด)
+    await openPlaceDetail(placeId);
+  }
+});
+
 // ===============================
 // Detail offcanvas (place card)
 // ===============================
@@ -1251,10 +1536,32 @@ window.openPlaceDetail = openPlaceDetail;
       handleSearch(provinceName);
     });
 
+    await buildPlaceLookup();
+    await buildTelemedLookup();
+
   } catch (err) {
     console.error('bootOverviewMap error:', err);
   }
 })();
+
+// ===============================
+// When mapModal closed → reopen search offcanvas
+// ===============================
+const mapModalEl = document.getElementById('mapModal');
+const mainOffcanvasEl = document.getElementById('offcanvasMain');
+
+if (mapModalEl && mainOffcanvasEl) {
+  mapModalEl.addEventListener('hidden.bs.modal', function () {
+
+    // เปิด offcanvas search ถ้ายังไม่เปิด
+    if (!mainOffcanvasEl.classList.contains('show')) {
+      bootstrap.Offcanvas
+        .getOrCreateInstance(mainOffcanvasEl)
+        .show();
+    }
+
+  });
+}
 
 function bindResponsiveOffcanvasContent() {
   const el = document.querySelector('.offcanvas--content');
