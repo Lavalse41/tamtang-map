@@ -21,6 +21,7 @@
   --red-2:                #FFEFE9;
   --red-3:                #FFD8CA;
   --red-4:                #860202;
+  --green:                #14B12B;
 
   --active-color:#C1FF6B;
   --inactive-color:#eaeaea;
@@ -535,6 +536,16 @@ a {
 }
 .modal.modal--telemed .modal__detail {
   margin-top: 2rem;
+}
+.tag.tag--recommend {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--green);   /* ปรับสีได้ */
+  color: var(--white);
+  vertical-align: middle;
 }
 
 /* Filter Noti */

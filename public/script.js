@@ -91,7 +91,7 @@ async function makeProvinceList() {
 
     const provinceNames = [...new Set(data.map(item => item.province))];
 
-    console.log("provinceNames:", provinceNames);
+    // console.log("provinceNames:", provinceNames);
     return provinceNames;
   } catch (error) {
     console.error("Error fetching province data:", error);
@@ -104,7 +104,7 @@ async function makeProvinceSelectList() {
   try {
     const response = await fetch('https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/province.json');
     const data = await response.json();
-    console.log("data:", data);
+    // console.log("data:", data);
     return data;
   } catch (error) {
     console.error("Error fetching province data:", error);
@@ -128,7 +128,7 @@ async function buildPlaceLookup() {
       placeLookupMap[key] = p.place_id;
     });
 
-    console.log('placeLookupMap built:', placeLookupMap);
+    // console.log('placeLookupMap built:', placeLookupMap);
 
   } catch (err) {
     console.error('buildPlaceLookup error:', err);
@@ -146,7 +146,7 @@ async function buildTelemedLookup() {
       telemedPlaceMap[key] = true;
     });
 
-    console.log('telemedPlaceMap built:', telemedPlaceMap);
+    // console.log('telemedPlaceMap built:', telemedPlaceMap);
 
   } catch (err) {
     console.error('buildTelemedLookup error:', err);
@@ -435,14 +435,18 @@ if (weekValueRaw === 'all') {
         </p>
       `;
 
-        // ใส่ชื่อจังหวัดลง modal title
+      // ✅ เปิด modal เฉพาะตอน mobile
+      if (window.innerWidth < 768) {
         const modalTitle = document.getElementById('mapModalLabel');
         if (modalTitle) {
           modalTitle.innerHTML = `${provinceName}<br>ยังไม่มีสถานบริการที่เปิดเผยข้อมูล`;
         }
 
-        const mapModal = new bootstrap.Modal(document.getElementById('mapModal'));
+        const mapModal = bootstrap.Modal.getOrCreateInstance(
+          document.getElementById('mapModal')
+        );
         mapModal.show();
+      }
     } else {
       detailHtml = `
         <p class="text-center">
@@ -1172,6 +1176,10 @@ async function getTelemedService() {
   }
 }
 
+function isRecommend(v) {
+  return String(v ?? '').toLowerCase().trim() === 'y';
+}
+
 function buildTelemedTableRows(data) {
   if (!Array.isArray(data) || data.length === 0) {
     return `
@@ -1270,7 +1278,17 @@ function buildTelemedTableRows(data) {
     const lookupKey = `${place.name_th}__${place.province}`;
     const placeId = placeLookupMap[lookupKey] || '';
 
-    const name = esc(place.name_th || '-');
+    const isClinicRecommended = isRecommend(place.recommend);
+    const recommendTag = isClinicRecommended
+      ? `<span class="tag tag--recommend">แนะนำ</span>`
+      : '';
+
+    const name = `
+      <div class="clinic-name">
+        ${esc(place.name_th || '-')}&nbsp;${recommendTag}
+      </div>
+    `;
+
     const province = esc(place.province || '-');
 
     const mustUltrasound = String(place.must_ultrasound).trim() === 'y'
@@ -1452,7 +1470,7 @@ function resetSearchUI() {
   $('#search').val('');
 
   // 2) รีเซ็ตฟิลเตอร์กลับค่า default (ปรับ value ให้ตรงกับ option ของคุณ)
-  $('#week-filter').val('9');    // default: ต่ำกว่า 12
+  $('#week-filter').val('all');    // default: all
   $('#price-filter').val('all'); // default: ทั้งหมด
   $('#type-filter').val('all');  // default: ทั้งหมด
   $('#foreigner-med-checkbox').prop('checked', false);
@@ -1515,9 +1533,6 @@ window.openPlaceDetail = openPlaceDetail;
 // ===============================
 (async function bootOverviewMap() {
   try {
-    // ❌ เลิกใช้ simplemap
-    $('#simplemap').hide();
-    $('#map').show();
 
     // ดึง center ของทุกจังหวัด
     const centers = await getAllProvinceCenters();
