@@ -629,10 +629,7 @@ a {
 .card.card--place .card__tag.warning {
   background-color: var(--yellow-light);
 }
-.card.card--place .card__tag.telemed {
-  background-color: var(--red);
-  color: var(--white);
-}
+
 /* .card.card--place .card__tag.price { background-color: var(--blue-light); }
 .card.card--place .card__tag.foreigner { background-color: var(--green-light); } */
 
@@ -680,10 +677,10 @@ a {
 .media.media--notice .media__item.media__item-warn {
   background-color: var(--yellow-light);
 }
-.media.media--notice .media__item.media__item-telemed {
+/* .media.media--notice .media__item.media__item-telemed {
   background-color: var(--red);
   color: var(--white);
-}
+} */
 
 /* Nav Tab */
 /* Service Nav */

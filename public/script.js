@@ -846,7 +846,7 @@ function buildNoticeHtml(data) {
   if (String(data?.has_telemed ?? '').trim() === 'y') {
     normalItems.push(`
       <div class="media__item media__item-telemed">
-        <img class="media__icon" src="./asset/envelope-white.svg" alt="">
+        <img class="media__icon" src="./asset/circle-check.svg" alt="">
         <div class="media__title">
           สามารถรับยาทางพัสดุไปรษณีย์ได้ (ไม่ต้องเดินทาง)
         </div>
