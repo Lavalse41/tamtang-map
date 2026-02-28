@@ -424,13 +424,13 @@ if (weekValueRaw === 'all') {
         <p class="text-center">ไม่เป็นไรนะ เรามีคำแนะนำให้</p>
         <ul>
           <li>ค้นหาในจังหวัดอื่นที่ใกล้เคียง</li>
-          <li><a href="#0" target="_blank">ติดต่อคลินิกทานตะวัน</a> เพื่อขอรับยาทางไปรษณีย์</li>
+          <li>ติดต่อ <a href="https://lin.ee/lLiZN34" target="_blank">คลินิกทานตะวัน</a> เพื่อขอรับยาทางไปรษณีย์</li>
         </ul>
       `;
     } else if (normalizedStatus === 'has_gov_hidden') {
       detailHtml = `
         <p class="text-center">
-          สามารถ<a href="#0" target="_blank">ติดต่อคลินิกทานตะวัน</a>เพื่อขอรับยาทางไปรษณีย์
+          สามารถติดต่อ <a href="https://lin.ee/lLiZN34" target="_blank">คลินิกทานตะวัน</a> เพื่อขอรับยาทางไปรษณีย์
           <span class="d-inline-block">หรือสอบถามทางเลือกเพิ่มเติม</span>
         </p>
       `;

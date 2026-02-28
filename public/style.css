@@ -677,10 +677,7 @@ a {
 .media.media--notice .media__item.media__item-warn {
   background-color: var(--yellow-light);
 }
-/* .media.media--notice .media__item.media__item-telemed {
-  background-color: var(--red);
-  color: var(--white);
-} */
+
 
 /* Nav Tab */
 /* Service Nav */
