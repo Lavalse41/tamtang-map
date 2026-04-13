@@ -701,7 +701,10 @@ function buildPlaceContactHtml(data) {
     openLine1 = `เปิดทำการ ${openDay}${(openFrom && openTo) ? ` เวลา ${openFrom} - ${openTo} น.` : ''}`;
   }
 
-  let openLine2 = closedDay ? `ยกเว้น ${closedDay}` : '';
+  let openLine2 = '';
+  if (closedDay !== '-') {
+    openLine2 = `ยกเว้น ${closedDay}`;
+  }
 
   const tel = esc(data?.tel || '');
   const line = esc(data?.line || '');
@@ -785,7 +788,7 @@ function buildNoticeHtml(data) {
   }
 
   const underAge = String(data?.under_age ?? '').trim();
-  if (underAge !== '' && underAge !== 'n') {
+  if (underAge !== '' && underAge !== '0') {
     warnItems.push(`
       <div class="media__item media__item-warn">
         <img class="media__icon" src="./asset/triangle.svg" alt="">
@@ -1201,6 +1204,7 @@ function buildTelemedTableRows(data) {
         province: row.province,
         must_ultrasound: row.must_ultrasound,
         has_foreigner_price: row.has_foreigner_price,
+        recommend: row.recommend,
         services: []
       };
     }
